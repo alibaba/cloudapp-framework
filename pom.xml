@@ -38,7 +38,7 @@
     </scm>
 
     <properties>
-        <revision>1.0.3</revision>
+        <revision>1.0.3.AS2.RELEASE</revision>
         <cloudapp.groupId>com.alibaba.cloudapp</cloudapp.groupId>
 
         <spring-boot.version>2.7.18</spring-boot.version>

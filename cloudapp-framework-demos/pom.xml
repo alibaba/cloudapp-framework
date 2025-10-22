@@ -19,7 +19,7 @@
     <description>cloudapp-framework-demos</description>
 
     <properties>
-        <revision>1.0.3</revision>
+        <revision>1.0.3.AS2.RELEASE</revision>
         <cloudapp.groupId>com.alibaba.cloudapp</cloudapp.groupId>
 
         <maven.compiler.source>8</maven.compiler.source>

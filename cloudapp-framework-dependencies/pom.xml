@@ -18,7 +18,7 @@
 
     <properties>
         <cloudapp.groupId>com.alibaba.cloudapp</cloudapp.groupId>
-        <revision>1.0.3</revision>
+        <revision>1.0.3.AS2.RELEASE</revision>
 
         <spring-boot.version>2.7.18</spring-boot.version>
         <aliee.version>2.7.18.1</aliee.version>
