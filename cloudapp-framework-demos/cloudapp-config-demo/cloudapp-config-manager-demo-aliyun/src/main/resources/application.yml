@@ -14,15 +14,9 @@ io:
         write:
           enabled: true
           timeout: 5000
-          #          example value: cloudapp
           group: ${group:cloudapp}
-          #          example value: cn-wulan-env1-d01
           regionId: ${regionId:any}
-          #          example value: 5ff2f842-22e3-473c-800a-cde6198e89ee
           namespaceId: ${namespaceId}
-          #          example value: dncs-api.console.cn-wulan-env1-d01.inter.env1.shuguang.com
           domain: ${dncs_endpoint}
-          #          example value: 8BuCwW4lsjWXXXXX
           accessKey: ${AK}
-          #          example value: kPsXOHRphISlRCH06Ru2OWG3QXXXXX
           secretKey: ${SK}
