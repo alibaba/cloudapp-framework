@@ -17,7 +17,12 @@
     <name>cloudapp-apigateway-demo</name>
     <description>cloudapp-apigateway-demo</description>
     <modules>
-        <module>cloudapp-apigateway-demo-aliyun</module>
+        <module>cloudapp-apigateway-apikey-demo-aliyun</module>
+        <module>cloudapp-apigateway-basic-demo-aliyun</module>
+        <module>cloudapp-apigateway-jwt-demo-aliyun</module>
+        <module>cloudapp-apigateway-oauth2-demo-aliyun</module>
+        <module>cloudapp-apigateway-proxy-demo-aliyun</module>
+        <module>cloudapp-apigateway-manager-demo-aliyun</module>
     </modules>
 
 </project>

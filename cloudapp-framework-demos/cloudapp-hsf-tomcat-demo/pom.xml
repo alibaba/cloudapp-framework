@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.alibaba.cloudapp</groupId>
+        <artifactId>cloudapp-framework-demos</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath> <!-- lookup parent from repository -->
+    </parent>
+
+    <artifactId>cloudapp-hsf-tomcat-demo</artifactId>
+    <name>cloudapp-hsf-tomcat-demo</name>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>cloudapp-hsf-tomcat-consumer-demo</module>
+        <module>cloudapp-hsf-tomcat-provider-demo</module>
+    </modules>
+
+    <repositories>
+        <repository>
+            <id>edas-public</id>
+            <url>https://edas-public.oss-cn-hangzhou.aliyuncs.com/repository</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+</project>

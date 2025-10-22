@@ -20,9 +20,9 @@ property, which can be used to gracefully close the connection and connect to a 
 
 # Dependencies
 
-| **Components**   | **SDK**                    | **Version** |
-|:-----------------|----------------------------|-------------|
-| spring boot druid| druid-spring-boot-starter  | 1.2.23      |
+| **Components**    | **SDK**                    | **Version** |
+|:------------------|----------------------------|-------------|
+| spring boot druid | druid-spring-boot-starter  | 1.2.23      |
 
 
 # Abstract

@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: KafkaDemo
+
+io:
+  cloudapp:
+    messaging:
+      kafka:
+        servers: ${KAFKA_SERVER:10.205.43.86:8088,10.205.46.205:8088,10.205.43.233:8088}
+        username: ${KAFKA_USERNAME:cloudapp}
+        password: ${KAFKA_PASSWORD:cloudapp}
+        mechanism: SCRAM-SHA-256
+        security-protocol: SASL_PLAINTEXT
+        inputs:
+          - name: testKafkaConsumer
+            topic: test-topic
+            group: test-group
+        outputs:
+          - name: testKafkaProducer
+            group: test-group
+            topic: test-topic

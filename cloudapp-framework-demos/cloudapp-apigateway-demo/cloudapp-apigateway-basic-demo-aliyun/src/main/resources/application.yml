@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: apigateway-aliyun-demo
+  main:
+    allow-bean-definition-overriding: true
+io:
+  cloudapp:
+    apigateway:
+      aliyun:
+        enabled: true
+        brokerUrl: ${brokerUrl}
+        basic:
+          username: ${username}
+          password: ${password}

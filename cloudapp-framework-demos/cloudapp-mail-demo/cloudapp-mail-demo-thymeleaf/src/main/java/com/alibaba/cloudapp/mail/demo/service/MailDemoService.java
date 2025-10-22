@@ -39,7 +39,7 @@ public class MailDemoService {
     
     @Autowired
     private TemplateEmailService templateEmailService;
-    @Value("${com.alibaba.cloudapp.mail.username}")
+    @Value("${io.cloudapp.mail.username}")
     private String from;
     
     private static final String TEMP_NAME = "test";

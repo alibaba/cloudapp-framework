@@ -46,7 +46,7 @@ class KafkaRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.messaging.kafka",
+        assertEquals("io.cloudapp.messaging.kafka",
                      component.bindKey()
         );
     }

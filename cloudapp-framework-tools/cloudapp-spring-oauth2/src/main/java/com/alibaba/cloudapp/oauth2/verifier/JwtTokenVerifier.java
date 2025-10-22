@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Base64;
 
 public class JwtTokenVerifier implements TokenVerifier {
     
@@ -62,8 +63,9 @@ public class JwtTokenVerifier implements TokenVerifier {
             DecodedJWT jwt = JWT.decode(token);
             Jwk jwk = jwkProvider.get(jwt.getKeyId());
             
-            Algorithm algorithm = AlgorithmUtil.getGenerateAlgorithm(
-                    jwk.getAlgorithm(), jwk.getPublicKey().getEncoded());
+            Algorithm algorithm = AlgorithmUtil.getVerifyAlgorithm(
+                    jwk.getAlgorithm(),
+                    Base64.getEncoder().encode(jwk.getPublicKey().getEncoded()));
             
             algorithm.verify(jwt);
             return true;

@@ -35,13 +35,13 @@ public class FileUtils {
         File file = new File(filePath);
 
         if (!file.exists()) {
-            logger.error("Failed to read properties from file {}, file not exits",
+            logger.warn("Failed to read properties from file {}, file not exits",
                     filePath);
             return Collections.emptyMap();
         }
 
         if (!file.canRead()) {
-            logger.error("Failed to read properties from file {}, file can't read",
+            logger.warn("Failed to read properties from file {}, file can't read",
                     filePath);
             return Collections.emptyMap();
         }
@@ -51,7 +51,7 @@ public class FileUtils {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             properties.load(reader);
         } catch (Throwable t) {
-            logger.error("Failed to read properties from file {}", filePath, t);
+            logger.warn("Failed to read properties from file {}", filePath, t);
         }
 
         if (properties.isEmpty()) {

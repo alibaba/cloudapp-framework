@@ -21,7 +21,6 @@ package com.alibaba.cloudapp.starter.filestore.configuration;
 import com.alibaba.cloudapp.exeption.CloudAppInvalidAccessException;
 import com.alibaba.cloudapp.filestore.minio.ClientProvider;
 import com.alibaba.cloudapp.filestore.minio.service.*;
-import com.alibaba.cloudapp.filestore.minio.service.*;
 import com.alibaba.cloudapp.starter.filestore.properties.MinioEndpointProperties;
 import com.alibaba.cloudapp.starter.properties.EnableModuleProperties;
 import io.minio.MinioClient;

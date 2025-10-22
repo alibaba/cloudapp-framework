@@ -42,7 +42,7 @@
 
         <dependency>
             <groupId>com.alibaba.cloudapp</groupId>
-            <artifactId>cloudapp-spring-messaging-rocketmq</artifactId>
+            <artifactId>cloudapp-spring-rocketmq-aliyun</artifactId>
         </dependency>
 
 <!--        <dependency>-->

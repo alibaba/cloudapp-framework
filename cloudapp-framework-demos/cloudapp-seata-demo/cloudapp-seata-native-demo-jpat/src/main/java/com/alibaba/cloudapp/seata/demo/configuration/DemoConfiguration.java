@@ -68,7 +68,7 @@ public class DemoConfiguration {
         
         return factoryBuilder
                 .dataSource(new DataSourceProxy(datasource))
-                .packages("com.alibaba.cloudapp.seata.demo")
+                .packages("io.cloudapp.seata.demo")
                 .properties(vendorProperties)
                 .jta(false)
                 .build();

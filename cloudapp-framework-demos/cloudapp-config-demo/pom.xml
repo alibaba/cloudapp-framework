@@ -2,6 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.alibaba.cloudapp</groupId>
         <artifactId>cloudapp-framework-demos</artifactId>
@@ -15,8 +16,11 @@
     <packaging>pom</packaging>
     <name>cloudapp-config-demo</name>
     <description>cloudapp-config-demo</description>
+
     <modules>
         <module>cloudapp-config-demo-aliyun</module>
+        <module>cloudapp-config-read-demo-aliyun</module>
+        <module>cloudapp-config-manager-demo-aliyun</module>
     </modules>
 
 </project>

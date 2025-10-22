@@ -51,6 +51,8 @@ public class RocketProducerProperties {
     private String traceTopic;
 
     private boolean isDefault = false;
+    
+    private boolean vipChannelEnable = false;
 
     public String getGroup() {
         return group;
@@ -178,5 +180,13 @@ public class RocketProducerProperties {
 
     public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
+    }
+    
+    public boolean isVipChannelEnable() {
+        return vipChannelEnable;
+    }
+    
+    public void setVipChannelEnable(boolean vipChannelEnable) {
+        this.vipChannelEnable = vipChannelEnable;
     }
 }

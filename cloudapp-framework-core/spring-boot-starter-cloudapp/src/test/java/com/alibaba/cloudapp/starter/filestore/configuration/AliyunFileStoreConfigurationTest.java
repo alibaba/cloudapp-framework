@@ -1,6 +1,5 @@
 package com.alibaba.cloudapp.starter.filestore.configuration;
 
-import com.alibaba.cloudapp.filestore.aliyun.service.*;
 import com.aliyun.oss.OSS;
 import com.alibaba.cloudapp.exeption.CloudAppInvalidAccessException;
 import com.alibaba.cloudapp.filestore.aliyun.service.*;
@@ -8,6 +7,7 @@ import com.alibaba.cloudapp.starter.filestore.properties.OSSEndpointProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;

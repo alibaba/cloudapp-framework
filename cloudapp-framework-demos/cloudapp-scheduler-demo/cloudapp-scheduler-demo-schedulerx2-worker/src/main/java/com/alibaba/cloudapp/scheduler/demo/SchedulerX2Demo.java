@@ -24,20 +24,23 @@ import com.alibaba.cloudapp.api.scheduler.worker.GlobalJobHelper;
 import com.alibaba.cloudapp.util.DateUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
 @Component
 public class SchedulerX2Demo {
+
+    private static final boolean autoCreation = false;
     
     private static final Logger logger = LoggerFactory.getLogger(
             SchedulerX2Demo.class);
     
     @GlobalJob(cron = "0 0 1 */1 * ?",
             description = "backup data",
-            autoCreateJob = true,
-            autoDeleteJob = true)
+            autoCreateJob = autoCreation,
+            autoDeleteJob = autoCreation)
     public void backup() {
         logger.info("Data backup logic..");
     }
@@ -52,8 +55,8 @@ public class SchedulerX2Demo {
             preProcess = "preMethodCloudApp",
             postProcess = "postMethodCloudApp",
             description = "test description",
-            autoCreateJob = true,
-            autoDeleteJob = true)
+            autoCreateJob = autoCreation,
+            autoDeleteJob = autoCreation)
     public void withPreAndPostMethodCloudApp() {
         String jobParam = GlobalJobHelper.getJobParam();
         long jobId = GlobalJobHelper.getJobId();
@@ -94,7 +97,8 @@ public class SchedulerX2Demo {
     @GlobalJob(cron = "0 * * * * ?",
             executeMode = "sharding",
             shardingParams = "0=a,1=b",
-            autoDeleteJob = true)
+            autoCreateJob = autoCreation,
+            autoDeleteJob = autoCreation)
     public void shardMethodCloudApp() {
         String jobParam = GlobalJobHelper.getJobParam();
         long jobId = GlobalJobHelper.getJobId();
@@ -111,7 +115,8 @@ public class SchedulerX2Demo {
     }
     
     @GlobalJob(fixedDelay = 10,
-            autoDeleteJob = false)
+            autoCreateJob = autoCreation,
+            autoDeleteJob = autoCreation)
     public void fixedDelayMethodCloudApp() {
         logger.info("Execute fixedDelayMethodCloudApp method success. now :{}",
                     DateUtil.formatDate(new Date(), DateUtil.TIMESTAMP_FORMAT)
@@ -120,7 +125,8 @@ public class SchedulerX2Demo {
     
     @GlobalJob(value = "specifyFixedRateMethodCloudApp",
             fixedRate = 60,
-            autoDeleteJob = false)
+            autoCreateJob = autoCreation,
+            autoDeleteJob = autoCreation)
     public void fixedRateMethodCloudApp() {
         logger.info(
                 "Execute specifyFixedRateMethodCloudApp method success. now :{}",

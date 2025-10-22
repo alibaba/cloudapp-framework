@@ -17,6 +17,7 @@
     <modules>
         <module>cloudapp-spring-messaging-kafka</module>
         <module>cloudapp-spring-messaging-rocketmq</module>
+        <module>cloudapp-spring-rocketmq-aliyun</module>
     </modules>
 
     <dependencies>

@@ -9,23 +9,45 @@ to collect relevant metrics for transactions in seata.
 
 # Scenario
 
-| **Feature**                | **Function/Case**       | **Seata support**                 | **demo support**                 |
-|:---------------------------|:------------------------|-----------------------------------|----------------------------------|
-| Core                       | automatic configuration | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-|                            | dynamic configuration   | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-| OpenTelemetry monitor      | -                       | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-| transactional patterns     | AT mode                 | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-|                            | TCC mode                | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-|                            | Saga mode               | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
-|                            | XA mode                 | <input type="checkbox" checked>   | <input type="checkbox" checked>  |
+| **Feature**      | **Function/Case** | **TXC support** | **demo support**                 |
+|:-----------------|:------------------|-----------------|----------------------------------|
+| Transaction mode | -                 | -               | <input type="checkbox" checked>  |
+
 
 
 # Dependencies
 
-| **Components**        | **SDK**                                   | **Version**  |
-|:----------------------|-------------------------------------------|--------------|
-| seata implementation  | spring-cloud-starter-alibaba-seata        | 2.2.10       |
-| OpenTelemetry         | opentelemetry-instrumentation-annotations | 2.6.0        |
+| **Components** | **SDK**                        | **Version** |
+|:---------------|--------------------------------|-------------|
+| txc implement  | txc-client                     | 2.8.95      |
+|                | txc-common                     | 2.8.95      |
+|                | txc-resourcemanager            | 2.8.95      |
+|                | txc-rpc                        | 2.8.95      |
+|                | txc-client-springcloud         | 2.8.95      |
+|                | txc-datasource                 | 2.8.95      |
+|                | txc-datasource-common          | 2.8.95      |
+|                | txc-datasource-cobar           | 2.8.95      |
+|                | druid-spring-boot-starter      | 1.2.23      |
+|                | spring-boot-starter-data-jpa   | 2.7.18      |
+|                | spring-cloud-starter-openfeign | 3.1.5       |
+
+## maven repository
+```xml
+<repositories>
+  <repository>
+    <id>edas-repository</id>
+    <name>EDAS Repository</name>
+    <url>https://edas-public.oss-cn-hangzhou.aliyuncs.com/repository</url>
+    <releases>
+      <enabled>true</enabled>
+      <checksumPolicy>fail</checksumPolicy>
+    </releases>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
 
 
 # Abstract

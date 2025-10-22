@@ -49,7 +49,7 @@ class RedisSequenceRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.sequence.redis",
+        assertEquals("io.cloudapp.sequence.redis",
                      component.bindKey()
         );
     }

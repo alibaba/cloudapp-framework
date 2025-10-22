@@ -160,10 +160,7 @@ public class DateUtilTest {
     
     @Test
     public void testFormatTimestamp() {
-        assertTrue("1970-01-01 08:00:00".equalsIgnoreCase(
-                DateUtil.formatTimestamp(0L)) ||
-                "1970-01-01 00:00:00".equalsIgnoreCase(
-                DateUtil.formatTimestamp(0L)));
+        assertEquals("1970-01-01 08:00:00", DateUtil.formatTimestamp(0L));
     }
     
     @Test

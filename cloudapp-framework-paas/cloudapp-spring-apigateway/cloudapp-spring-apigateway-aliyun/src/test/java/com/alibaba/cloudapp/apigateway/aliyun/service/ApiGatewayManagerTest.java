@@ -19,20 +19,25 @@
 
 package com.alibaba.cloudapp.apigateway.aliyun.service;
 
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.HttpResponse;
+import com.aliyuncs.http.MethodType;
 import com.alibaba.cloudapp.apigateway.aliyun.properties.ApiKeyProperties;
 import com.alibaba.cloudapp.apigateway.aliyun.properties.BasicProperties;
 import com.alibaba.cloudapp.apigateway.aliyun.properties.JwtProperties;
 import com.alibaba.cloudapp.exeption.CloudAppException;
-import com.alibaba.cloudapp.exeption.CloudAppInvalidAccessException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,14 +45,16 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ApiGatewayManagerTest {
     
     @Mock
-    private RestTemplate mockRestTemplate;
-    
+    IAcsClient client;
+    @Mock
+    CommonResponse res;
     private ApiGatewayManager gatewayManager;
     
     @Before
@@ -56,8 +63,21 @@ public class ApiGatewayManagerTest {
                 "accessKey",
                 "secretKey",
                 "gatewayUri",
-                mockRestTemplate
+                "regionId",
+                "resourceGroupId",
+                "organizationId"
+                ,false
         );
+        Field f =  ApiGatewayManager.class.getDeclaredField("client");
+        f.setAccessible(true);
+        f.set(gatewayManager, client);
+        
+        doReturn(res).when(client).getCommonResponse(any(CommonRequest.class));
+        HttpResponse httpResponse = new HttpResponse("url");
+        httpResponse.setStatus(200);
+        
+        doReturn(httpResponse).when(res).getHttpResponse();
+        
     }
     
     @Test
@@ -66,11 +86,6 @@ public class ApiGatewayManagerTest {
         final ApiKeyProperties apiKey = new ApiKeyProperties();
         apiKey.setApiKey("apiKey");
         apiKey.setHeaderName("headerName");
-        
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
-                .thenReturn(new ResponseEntity<>("body", HttpStatus.OK));
         
         // Run the test
         gatewayManager.createApiKeyConsumer(
@@ -83,15 +98,14 @@ public class ApiGatewayManagerTest {
     }
     
     @Test
-    public void testCreateApiKeyConsumer_RestTemplateThrowsRestClientException() {
+    public void testCreateApiKeyConsumer_RestTemplateThrowsRestClientException()
+            throws ClientException {
         // Setup
         final ApiKeyProperties apiKey = new ApiKeyProperties();
         apiKey.setApiKey("apiKey");
         apiKey.setHeaderName("headerName");
         
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
+        when(client.getCommonResponse(any(CommonRequest.class)))
                 .thenThrow(RestClientException.class);
         
         // Run the test
@@ -114,11 +128,6 @@ public class ApiGatewayManagerTest {
         jwt.setSubject("subject");
         jwt.setExpiredSecond(0L);
         
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
-                .thenReturn(new ResponseEntity<>("body", HttpStatus.OK));
-        
         // Run the test
         gatewayManager.createJwtConsumer(
                 "name", "gwInstanceId",
@@ -129,7 +138,8 @@ public class ApiGatewayManagerTest {
     }
     
     @Test
-    public void testCreateJwtConsumer_RestTemplateThrowsRestClientException() {
+    public void testCreateJwtConsumer_RestTemplateThrowsRestClientException()
+            throws ClientException {
         // Setup
         final JwtProperties jwt = new JwtProperties();
         jwt.setKeyId("keyId");
@@ -138,9 +148,7 @@ public class ApiGatewayManagerTest {
         jwt.setSubject("subject");
         jwt.setExpiredSecond(0L);
         
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
+        when(client.getCommonResponse(any(CommonRequest.class)))
                 .thenThrow(RestClientException.class);
         
         // Run the test
@@ -159,10 +167,6 @@ public class ApiGatewayManagerTest {
         basic.setUsername("username");
         basic.setPassword("password");
         
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
-                .thenReturn(new ResponseEntity<>("body", HttpStatus.OK));
         
         // Run the test
         gatewayManager.createBasicConsumer(
@@ -174,15 +178,14 @@ public class ApiGatewayManagerTest {
     }
     
     @Test
-    public void testCreateBasicConsumer_RestTemplateThrowsRestClientException() {
+    public void testCreateBasicConsumer_RestTemplateThrowsRestClientException()
+            throws ClientException {
         // Setup
         final BasicProperties basic = new BasicProperties();
         basic.setUsername("username");
         basic.setPassword("password");
         
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
+        when(client.getCommonResponse(any(CommonRequest.class)))
                 .thenThrow(RestClientException.class);
         
         // Run the test
@@ -199,12 +202,7 @@ public class ApiGatewayManagerTest {
         // Setup
         
         // Run the test
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        )).thenReturn(new ResponseEntity<>(
-                "{\"data\": {\"records\": [{\"appName\":\"name\"}]}}",
-                HttpStatus.OK
-        ));
+        when(res.getData()).thenReturn("{\"data\": {\"records\": [{\"appName\":\"name\"}]}}");
         
         
         final boolean result = gatewayManager.checkConsumerExists(
@@ -215,11 +213,10 @@ public class ApiGatewayManagerTest {
     }
     
     @Test
-    public void testCheckConsumerExists_RestTemplateThrowsRestClientException() {
+    public void testCheckConsumerExists_RestTemplateThrowsRestClientException()
+            throws ClientException {
         // Setup
-        when(mockRestTemplate.exchange(any(RequestEntity.class),
-                                       any(Class.class)
-        ))
+        when(client.getCommonResponse(any(CommonRequest.class)))
                 .thenThrow(RestClientException.class);
         
         // Run the test
@@ -232,22 +229,19 @@ public class ApiGatewayManagerTest {
     @Test
     public void testInitRequestEntity() throws Exception {
         // Setup
-        final Map<String, String> query = new HashMap<>();
-        final Map<String, Object> body = new HashMap<>();
+        final Map<String, Object> query = new HashMap<>();
         final MediaType type = new MediaType("type", "subtype",
                                              StandardCharsets.UTF_8
         );
         
-        // Run the test
-        final RequestEntity<String> result = gatewayManager.initRequestEntity(
-                HttpMethod.GET, "path", query, body, type);
+        when(res.getData()).thenReturn("query");
         
+        // Run the test
+        final CommonResponse result = gatewayManager.requestServer(
+                "path", MethodType.GET, query
+        );
         // Verify the results
-        assertNotNull(result.getHeaders());
-        assertTrue(result.getHeaders().containsKey("X-HMAC-ACCESS-KEY"));
-        assertTrue(result.getHeaders().containsKey("X-CSB-OPENAPI"));
-        assertTrue(result.getHeaders().containsKey("X-HMAC-REQUEST-TIME"));
-        assertTrue(result.getHeaders().containsKey("X-HMAC-SIGN"));
+        assertEquals(result.getData(), "query");
     }
     
     @Test
@@ -261,14 +255,16 @@ public class ApiGatewayManagerTest {
         
         gatewayManager = new ApiGatewayManager(null,
                                                null,
+                                               "gatewayUri",
                                                null,
-                                               mockRestTemplate
+                                               null,
+                                               null,
+                                               false
         );
         
         // Run the test
-        assertThrows(CloudAppInvalidAccessException.class,
-                     () -> gatewayManager.initRequestEntity(
-                             HttpMethod.GET, "path", query, body, type)
+        assertThrows(NullPointerException.class,
+                     () -> gatewayManager.requestServer("path", MethodType.GET, body)
         );
     }
     

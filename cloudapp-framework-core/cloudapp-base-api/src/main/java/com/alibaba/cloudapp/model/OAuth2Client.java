@@ -40,7 +40,19 @@ public class OAuth2Client {
     
     private URI introspectionUri;
     
+    private List<String> filterSkipUrls;
+    
+    private String loginSuccessUrl;
+    
     private boolean enablePkce = false;
+    
+    public List<String> getFilterSkipUrls() {
+        return filterSkipUrls;
+    }
+    
+    public void setFilterSkipUrls(List<String> filterSkipUrls) {
+        this.filterSkipUrls = filterSkipUrls;
+    }
     
     public String getClientId() {
         return clientId;
@@ -120,5 +132,13 @@ public class OAuth2Client {
     
     public void setEnablePkce(boolean enablePkce) {
         this.enablePkce = enablePkce;
+    }
+    
+    public String getLoginSuccessUrl() {
+        return loginSuccessUrl;
+    }
+    
+    public void setLoginSuccessUrl(String loginSuccessUrl) {
+        this.loginSuccessUrl = loginSuccessUrl;
     }
 }

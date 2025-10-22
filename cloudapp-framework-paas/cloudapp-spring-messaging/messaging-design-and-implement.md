@@ -36,12 +36,11 @@ In scenarios where you work in a way that uses spring stream, you can turn off t
 
 # Dependencies
 
-| **Components**           | **SDK**                       | **Version**  |
-|:-------------------------|-------------------------------|--------------|
-| kafka implementation     | spring-kafka                  | 2.8.11       |
-|                          | kafka-clients                 | 3.1.2        |
-| rocketmq implementation  | alibabacloud-rocketmq20220801 | 1.0.12       |
-|                          | rocketmq-spring-boot          | 2.3.0        |
+| **Components**            | **SDK**         | **Version**   |
+|:--------------------------|-----------------|---------------|
+| kafka implementation      | kafka-clients   | 3.1.2         |
+| rocketmq implementation   | ons-client      | 1.8.5.Final   |
+|                           | ons-api         | 1.8.5.Final   |
 
 
 # Abstract

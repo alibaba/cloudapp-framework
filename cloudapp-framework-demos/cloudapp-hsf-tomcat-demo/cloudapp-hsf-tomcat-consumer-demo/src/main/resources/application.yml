@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: hsf-pandora-boot-consumer
+  hsf:
+    version: 1.0.0
+    timeout: 1000
+
+server:
+  port: 18082
+  servlet:
+    context-path: /

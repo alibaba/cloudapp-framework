@@ -85,7 +85,7 @@ public interface TrafficService {
      * @param labelValue the value of traffic label
      * @return return the opentelemetry scope object, used by try...final .
      */
-    Scope withTrafficLabel(String labelValue);
+    void withTrafficLabel(String labelValue);
 
     /**
      * Get the current user requesting values, e.g: the user-data in an eagleeye
@@ -109,7 +109,7 @@ public interface TrafficService {
      * @param pairs key-value pairs of user-data that brought by baggage
      * @return return the opentelemetry scope object, used by try...final .
      */
-    Scope withBaggageUserData(Map<String, String> pairs);
+    void withBaggageUserData(Map<String, String> pairs);
 
     /**
      * Get the current trace id, e.g: the trace-id in an eagleeye context request

@@ -9,22 +9,22 @@ advanced use cases, you can use it by obtaining native client delegated instance
 
 # Scenario
 
-| **Feature**                 | **Function/Case**               | **Alibaba Cloud Elasticsearch support**  | **demo support**                  |
-|:----------------------------|:--------------------------------|------------------------------------------|-----------------------------------|
-| Core                        | automatic configuration         | <input type="checkbox" checked>          | <input type="checkbox" checked>   |
-|                             | dynamic configuration           | <input type="checkbox" checked>          | -                                 |
-| Data management             | Search by mode/request          | <input type="checkbox" checked>          | <input type="checkbox" checked>   |
-|                             | Create/update/delete documents  | <input type="checkbox" checked>          | <input type="checkbox" checked>   |
-|                             | Create documents in bulk        | <input type="checkbox" checked>          | <input type="checkbox" checked>   |
-| Cluster management          | -                               | -                                        | -                                 |
-| Secure and highly available | -                               | -                                        | -                                 |
+| **Feature**                 | **Function/Case**               | **Alibaba Cloud Elasticsearch support** | **demo support**                |
+|:----------------------------|:--------------------------------|-----------------------------------------|---------------------------------|
+| Core                        | automatic configuration         | -                                       | <input type="checkbox" checked> |
+|                             | dynamic configuration           | -                                       | <input type="checkbox" checked> |
+| Data management             | Search by mode/request          | -                                       | <input type="checkbox" checked> |
+|                             | Create/update/delete documents  | -                                       | <input type="checkbox" checked> |
+|                             | Create documents in bulk        | -                                       | <input type="checkbox" checked> |
+| Cluster management          | -                               | -                                       | -                               |
+| Secure and highly available | -                               | -                                       | -                               |
 
 
 # Dependencies
 
-| **Components**       | **SDK**              | **Version**    |
-|:---------------------|----------------------|----------------|
-| elasticsearch client | elasticsearch-java   | 8.15.0         | 
+| **Components**       | **SDK**              | **Version** |
+|:---------------------|----------------------|-------------|
+| elasticsearch client | elasticsearch-java   | 7.x         | 
 
 
 # Abstract

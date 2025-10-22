@@ -19,6 +19,7 @@
 
 package com.alibaba.cloudapp.util;
 
+import com.alibaba.cloudapp.util.KeyUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

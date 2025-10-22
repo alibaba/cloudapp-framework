@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: apigateway-aliyun-demo
+  main:
+    allow-bean-definition-overriding: true
+
+io:
+  cloudapp:
+    apigateway:
+      aliyun:
+        enabled: true
+        brokerUrl: ${brokerUrl}
+        jwt:
+          keyId: ${keyId}
+          secret: ${secret}
+          issuer: ${issuer:}
+          subject: ${subject:}
+          audience: ${audience:}
+          expiredSecond: ${expiredSecond:31536000}
+          algorithm: ${algorithm:HS256}

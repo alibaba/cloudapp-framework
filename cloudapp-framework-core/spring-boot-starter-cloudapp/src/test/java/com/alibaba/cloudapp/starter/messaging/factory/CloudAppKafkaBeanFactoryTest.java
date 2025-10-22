@@ -118,12 +118,12 @@ class CloudAppKafkaBeanFactoryTest {
     void testSetEnvironment() {
         // Setup
         final MockEnvironment environment = new MockEnvironment();
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.servers", "bootstrapServers");
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.inputs[0].name", "name");
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.inputs[0].bootstrapServers", "bootstrapServers");
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.inputs[0].type", "type");
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.outputs[0].name", "name");
-        environment.setProperty("com.alibaba.cloudapp.messaging.kafka.outputs[0].topic", "topic");
+        environment.setProperty("io.cloudapp.messaging.kafka.servers", "bootstrapServers");
+        environment.setProperty("io.cloudapp.messaging.kafka.inputs[0].name", "name");
+        environment.setProperty("io.cloudapp.messaging.kafka.inputs[0].bootstrapServers", "bootstrapServers");
+        environment.setProperty("io.cloudapp.messaging.kafka.inputs[0].type", "type");
+        environment.setProperty("io.cloudapp.messaging.kafka.outputs[0].name", "name");
+        environment.setProperty("io.cloudapp.messaging.kafka.outputs[0].topic", "topic");
         
         
         // Run the test

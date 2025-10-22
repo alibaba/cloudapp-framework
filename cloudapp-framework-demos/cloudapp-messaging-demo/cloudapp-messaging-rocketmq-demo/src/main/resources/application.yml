@@ -22,19 +22,16 @@ io:
         useTLS: false
         enableMsgTrace: true
         #        traceTopic:
-#        inputs:
-#          - group: test-group
-#            #            accessChannel:
-#            #            messageModel: CLUSTERING
-#            #            pullBatchSize:
-#            #            namespace:
-#            name: rocketConsumer
-#            topic: test-topic
+        inputs:
+          - group: GID-test-group
+            name: rocketConsumer
+            topic: test-topic
+            namespace: MQ_INST_1643347622121632_Blw6vZq0
         outputs:
           - name: rocketProducer
             #            messageModel: CLUSTERING
-            group: test-group
-#            namespace:
+            group: GID-test-group
+            namespace: MQ_INST_1643347622121632_Blw6vZq0
 #            sendTimeout:
 #            instanceName:
 #            retryNextServer:

@@ -18,9 +18,6 @@
     <modules>
         <module>cloudapp-microservice-dubbo-demo</module>
         <module>cloudapp-microservice-springcloud-demo</module>
-        <module>cloudapp-microservice-springcloud-consumer</module>
-        <module>cloudapp-microservice-springcloud-provider</module>
-        <module>cloudapp-microservice-consumer-ribbon-ping</module>
     </modules>
 
     <dependencyManagement>

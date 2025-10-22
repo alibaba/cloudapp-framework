@@ -21,7 +21,6 @@ package com.alibaba.cloudapp.apigateway.aliyun.service;
 
 import com.alibaba.cloudapp.api.gateway.Authorized;
 import com.alibaba.cloudapp.api.gateway.authentication.*;
-import com.alibaba.cloudapp.api.gateway.authentication.*;
 import com.alibaba.cloudapp.api.gateway.model.JWTParams;
 import com.alibaba.cloudapp.api.oauth2.AuthorizationService;
 import com.alibaba.cloudapp.api.oauth2.TokenStorageService;
@@ -34,6 +33,7 @@ import com.alibaba.cloudapp.apigateway.aliyun.properties.Config;
 import com.alibaba.cloudapp.apigateway.aliyun.properties.JwtProperties;
 import com.alibaba.cloudapp.exeption.CloudAppException;
 import com.alibaba.cloudapp.model.OAuth2Client;
+import com.alibaba.cloudapp.oauth2.service.AuthorizationServiceImpl;
 import com.alibaba.cloudapp.oauth2.verifier.IntrospectionTokenVerifier;
 import com.alibaba.cloudapp.oauth2.verifier.JwtTokenVerifier;
 import org.slf4j.Logger;
@@ -55,6 +55,7 @@ public class AuthorizedService implements Authorized, InitializingBean {
     
     @Autowired(required = false)
     private TokenStorageService storageService;
+
     @Autowired(required = false)
     private AuthorizationService authorizationService;
     
@@ -120,6 +121,8 @@ public class AuthorizedService implements Authorized, InitializingBean {
             tokenVerifier =
                     new IntrospectionTokenVerifier(oAuth2.getIntrospectionUri());
         }
+        
+        this.authorizationService  = new AuthorizationServiceImpl(oAuth2);
         
         return new OAuth2Authorizer(authorizationService, storageService, tokenVerifier);
     }

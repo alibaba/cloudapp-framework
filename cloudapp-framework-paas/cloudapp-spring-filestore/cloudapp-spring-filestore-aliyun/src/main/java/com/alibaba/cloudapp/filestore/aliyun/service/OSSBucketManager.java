@@ -68,7 +68,7 @@ public class OSSBucketManager implements
         try {
             ListBucketsRequest request = new ListBucketsRequest();
             request.setPrefix(prefix);
-            request.setResourceGroupId(resourceGroupId);
+//            request.setResourceGroupId(resourceGroupId); //apasara not support
             request.setMaxKeys(OSSConstant.MAX_PAGE_SIZE);
 
             BucketList buckets;
@@ -135,7 +135,7 @@ public class OSSBucketManager implements
 
             ListBucketsRequest request = new ListBucketsRequest();
             request.setPrefix(prefix);
-            request.setResourceGroupId(resourceGroupId);
+//            request.setResourceGroupId(resourceGroupId); // apasara not support
             request.setMaxKeys(paging.getMaxResults());
             request.setMarker(paging.getNextToken());
 

@@ -1,6 +1,7 @@
 package com.alibaba.cloudapp.starter.observabilities.refresh;
 
 import com.alibaba.cloudapp.observabilities.opentelemetry.metric.GlobalOpenTelemetry;
+import com.alibaba.cloudapp.observabilities.opentelemetry.metric.MetricCollectionAspect;
 import com.alibaba.cloudapp.observabilities.opentelemetry.metric.MetricHelperServer;
 import com.alibaba.cloudapp.starter.observabilities.properties.OpenTelemetryProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,7 +41,7 @@ class OpenTelemetryRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.observabilities.ot",
+        assertEquals("io.cloudapp.observabilities.ot",
                      component.bindKey()
         );
     }

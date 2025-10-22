@@ -105,7 +105,7 @@ class OAuth2ComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.oauth2", component.bindKey());
+        assertEquals("io.cloudapp.oauth2", component.bindKey());
     }
     
     @Test

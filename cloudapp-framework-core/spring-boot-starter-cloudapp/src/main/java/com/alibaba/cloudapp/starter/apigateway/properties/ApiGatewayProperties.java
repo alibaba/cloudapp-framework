@@ -20,18 +20,14 @@
 package com.alibaba.cloudapp.starter.apigateway.properties;
 
 import com.alibaba.cloudapp.apigateway.aliyun.AuthTypeEnum;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.ApiKeyProperties;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.BasicProperties;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.Config;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.JwtProperties;
+import com.alibaba.cloudapp.apigateway.aliyun.properties.*;
 import com.alibaba.cloudapp.model.OAuth2Client;
 import com.alibaba.cloudapp.starter.apigateway.configuration.AuthorizedRefreshComponent;
 import com.alibaba.cloudapp.starter.base.properties.RefreshableProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = AuthorizedRefreshComponent.BINDING_KEY)
-public class ApiGatewayProperties extends RefreshableProperties implements
-        Config {
+public class ApiGatewayProperties extends RefreshableProperties implements Config {
 
     private ApiKeyProperties apiKey;
     private JwtProperties jwt;

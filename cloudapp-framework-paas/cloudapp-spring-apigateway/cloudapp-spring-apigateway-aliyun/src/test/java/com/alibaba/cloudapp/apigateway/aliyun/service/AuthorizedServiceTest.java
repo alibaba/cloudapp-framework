@@ -19,6 +19,7 @@
 
 package com.alibaba.cloudapp.apigateway.aliyun.service;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.cloudapp.api.gateway.authentication.Authorizer;
 import com.alibaba.cloudapp.api.gateway.authentication.BasicAuthorizer;
 import com.alibaba.cloudapp.api.gateway.authentication.NoAuthorization;

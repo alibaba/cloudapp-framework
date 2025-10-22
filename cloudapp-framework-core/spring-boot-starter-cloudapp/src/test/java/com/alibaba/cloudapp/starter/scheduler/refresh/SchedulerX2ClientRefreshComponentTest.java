@@ -57,7 +57,7 @@ class SchedulerX2ClientRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.scheduler.schedulerx2-worker",
+        assertEquals("io.cloudapp.scheduler.schedulerx2-worker",
                      component.bindKey()
         );
     }

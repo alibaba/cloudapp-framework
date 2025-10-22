@@ -19,7 +19,6 @@
 package com.alibaba.cloudapp.starter.filestore.configuration;
 
 
-import com.alibaba.cloudapp.filestore.aliyun.service.*;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import com.alibaba.cloudapp.exeption.CloudAppInvalidAccessException;

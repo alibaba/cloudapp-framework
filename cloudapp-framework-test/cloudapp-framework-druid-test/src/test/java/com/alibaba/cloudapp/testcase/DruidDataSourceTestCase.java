@@ -126,14 +126,14 @@ public class DruidDataSourceTestCase implements ApplicationContextAware {
 
     private void triggerRebuildDataSource() {
         System.setProperty("spring.datasource.druid.min-idle", "3");
-        System.setProperty("com.alibaba.cloudapp.datasource.druid.manage-version", "1.1");
+        System.setProperty("io.cloudapp.datasource.druid.manage-version", "1.1");
 
         // spring.datasource.url=jdbc:h2:file:./demo-db;NON_KEYWORDS=user
         System.setProperty("spring.datasource.url",
                 "jdbc:h2:file:./demo-updated-db;NON_KEYWORDS=user");
 
         assertThat(env.getProperty("spring.datasource.druid.min-idle")).isEqualTo("3");
-        assertThat(env.getProperty("com.alibaba.cloudapp.datasource.druid.manage-version")).isEqualTo("1.1");
+        assertThat(env.getProperty("io.cloudapp.datasource.druid.manage-version")).isEqualTo("1.1");
 
         RefreshEvent event = new RefreshEvent(this, null, "Refresh DataSource Config");
         applicationContext.publishEvent(event);

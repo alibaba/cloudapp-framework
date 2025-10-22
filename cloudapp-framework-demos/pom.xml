@@ -33,6 +33,9 @@
         <module>cloudapp-base-demo</module>
         <module>cloudapp-config-demo</module>
         <module>cloudapp-filestore-demo</module>
+        <module>cloudapp-hsf-pandora-boot-demo</module>
+        <module>cloudapp-hsf-tomcat-demo</module>
+        <module>cloudapp-mail-demo</module>
         <module>cloudapp-messaging-demo</module>
         <module>cloudapp-microservice-demo</module>
         <module>cloudapp-oauth2-demo</module>
@@ -41,11 +44,8 @@
         <module>cloudapp-search-demo</module>
         <module>cloudapp-sequence-demo</module>
         <module>cloudapp-scheduler-demo</module>
-        <module>cloudapp-base-utils-demo</module>
         <module>cloudapp-seata-demo</module>
-        <module>cloudapp-datasource-druid-demo</module>
-        <module>cloudapp-datasource-druid-observable-demo</module>
-        <module>cloudapp-mail-demo</module>
+        <module>cloudapp-datasource-demo</module>
         <module>cloudapp-aliee-demo</module>
     </modules>
 

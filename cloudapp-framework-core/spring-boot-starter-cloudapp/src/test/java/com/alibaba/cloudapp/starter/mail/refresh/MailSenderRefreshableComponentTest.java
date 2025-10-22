@@ -73,7 +73,7 @@ class MailSenderRefreshableComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.mail",
+        assertEquals("io.cloudapp.mail",
                      component.bindKey()
         );
     }

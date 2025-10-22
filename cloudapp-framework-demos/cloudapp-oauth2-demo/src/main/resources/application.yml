@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8088
 
 io:
   cloudapp:
@@ -17,3 +17,6 @@ io:
       authorization-uri: https://gitlab.com/oauth/authorize
       token-uri: https://gitlab.com/oauth/token
       jwks-url: https://gitlab.com/oauth/discovery/keys
+      login-success-url: /
+      filter-skip-urls:
+        - /oauth/**

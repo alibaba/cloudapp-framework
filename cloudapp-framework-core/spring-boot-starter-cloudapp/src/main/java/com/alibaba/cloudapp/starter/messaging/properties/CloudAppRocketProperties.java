@@ -22,7 +22,6 @@ package com.alibaba.cloudapp.starter.messaging.properties;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketConsumerProperties;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketProducerProperties;
 import com.alibaba.cloudapp.starter.base.properties.RefreshableProperties;
-import org.apache.rocketmq.client.AccessChannel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.util.List;
@@ -50,7 +49,7 @@ public class CloudAppRocketProperties extends RefreshableProperties {
 
     private String traceTopic;
     
-    private String accessChannel = AccessChannel.LOCAL.name();
+    private String accessChannel = "ALIYUN";
 
     private List<RocketConsumerProperties> inputs;
     private List<RocketProducerProperties> outputs;

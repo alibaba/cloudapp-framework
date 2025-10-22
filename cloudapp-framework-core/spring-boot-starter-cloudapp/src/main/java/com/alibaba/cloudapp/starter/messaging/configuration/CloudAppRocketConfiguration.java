@@ -23,7 +23,6 @@ import com.alibaba.cloudapp.messaging.rocketmq.CloudAppRocketProducer;
 import com.alibaba.cloudapp.starter.messaging.factory.CloudAppRocketBeanFactory;
 import com.alibaba.cloudapp.starter.messaging.properties.CloudAppRocketProperties;
 import com.alibaba.cloudapp.starter.messaging.refresh.RocketRefreshComponent;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,7 +30,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 
 @AutoConfiguration
-@ConditionalOnClass({RocketMQTemplate.class, CloudAppRocketProducer.class})
+@ConditionalOnClass({CloudAppRocketProducer.class})
 @EnableConfigurationProperties(CloudAppRocketProperties.class)
 @ConditionalOnProperty(
         prefix = CloudAppRocketProperties.PREFIX,

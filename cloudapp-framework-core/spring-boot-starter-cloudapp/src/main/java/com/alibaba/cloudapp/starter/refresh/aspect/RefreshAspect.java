@@ -48,7 +48,7 @@ public class RefreshAspect implements ApplicationListener<PropKeyRefreshedEvent>
     private final Map<String, RefreshableBeanDef> joints = new ConcurrentHashMap<>();
 
 
-    @Around("@annotation(com.alibaba.cloudapp.starter.refresh.aspect.RefreshableBinding)")
+    @Around("@annotation(RefreshableBinding)")
     public Object refreshPointcut(ProceedingJoinPoint joinPoint)
             throws Throwable {
         

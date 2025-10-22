@@ -46,7 +46,6 @@ supports management operations such as task groups and other job.
 |:-----------------------------------------------|---------------------|--------------|
 | Alibaba Cloud schedulerx server implementation | schedulerx220190430 | 2.0.0        |
 | Alibaba Cloud schedulerx worker implementation | schedulerx2-worker  | 1.11.5       |
-| xxljob implementation                          | xxl-job-core        | 2.4.1        |
 
 
 # Abstract

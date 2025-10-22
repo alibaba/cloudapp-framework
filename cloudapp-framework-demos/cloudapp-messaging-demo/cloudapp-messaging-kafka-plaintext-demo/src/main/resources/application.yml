@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: KafkaDemo
+
+io:
+  cloudapp:
+    messaging:
+      kafka:
+        servers: ${KAFKA_SERVER:10.205.43.86:8080,10.205.46.205:8080,10.205.43.233:8080}
+        inputs:
+          - name: testKafkaConsumer
+            topic: test-topic
+            group: test-group
+        outputs:
+          - name: testKafkaProducer
+            group: test-group
+            topic: test-topic

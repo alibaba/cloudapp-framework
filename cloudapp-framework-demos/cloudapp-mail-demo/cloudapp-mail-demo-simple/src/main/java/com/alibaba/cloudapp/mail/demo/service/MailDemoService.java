@@ -41,7 +41,7 @@ public class MailDemoService {
     
     @Autowired
     private EmailService mailService;
-    @Value("${com.alibaba.cloudapp.mail.username}")
+    @Value("${io.cloudapp.mail.username}")
     private String from;
     
     @Autowired

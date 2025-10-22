@@ -9,7 +9,7 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-    <name>cloudapp-spring-search-elasticsearch</name>
+    <name>cloudapp-microservice-aliyun</name>
     <artifactId>cloudapp-microservice-aliyun</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
@@ -17,6 +17,8 @@
         <module>cloudapp-microservice-dubbo-aliyun</module>
         <module>cloudapp-microservice-springcloud-aliyun</module>
         <module>cloudapp-microservice-aliyun-common</module>
+        <module>cloudapp-microservice-hsf-aliyun</module>
+        <module>cloudapp-microservice-hsf-war-aliyun</module>
     </modules>
 
     <dependencies>

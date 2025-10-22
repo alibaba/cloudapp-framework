@@ -19,13 +19,12 @@
 
 package com.alibaba.cloudapp.scheduler.demo;
 
-import com.alibaba.cloudapp.api.scheduler.model.*;
 import com.alibaba.fastjson2.JSON;
 import com.aliyun.schedulerx220190430.Client;
+import com.alibaba.cloudapp.api.scheduler.model.*;
 import com.alibaba.cloudapp.api.scheduler.server.JobExecuteService;
 import com.alibaba.cloudapp.api.scheduler.server.JobGroupManager;
 import com.alibaba.cloudapp.api.scheduler.server.JobManager;
-import com.alibaba.cloudapp.api.scheduler.server.*;
 import com.alibaba.cloudapp.exeption.CloudAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,8 @@ public class SchedulerX2DemoController {
     private JobExecuteService<Client> jobExecuteService;
     
     // =============================== JobGroup ===============================
-    
+
+//    TODO Error: The namespace parameter is not supported in apasara.
     @RequestMapping("/createJobGroup")
     public Long createJobGroup() throws CloudAppException {
         JobGroup jobGroup = new JobGroup();
@@ -104,7 +104,7 @@ public class SchedulerX2DemoController {
         job.setGroupId(groupId);
         job.setNamespace(namespaceId);
         job.setName(jobName);
-        job.setClassName("com.alibaba.cloudapp.scheduler.demo.service.DemoJob");
+        job.setClassName("io.cloudapp.scheduler.demo.service.DemoJob");
         job.setDescription("test job");
         job.setJobType(JobType.JAVA);
         job.setContent("{\"param1\":\"value1\"}");
@@ -124,7 +124,7 @@ public class SchedulerX2DemoController {
         job.setJobId(jobId);
         job.setNamespace(namespaceId);
         job.setName(jobName);
-        job.setClassName("com.alibaba.cloudapp.scheduler.demo.service.DemoJob");
+        job.setClassName("io.cloudapp.scheduler.demo.service.DemoJob");
         job.setDescription("test job, updated.");
         job.setJobType(JobType.JAVA);
         job.setTimeType(TimeType.NONE);

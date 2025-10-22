@@ -13,9 +13,9 @@ com.alibaba.cloudapp.starter.redis.configuration.CloudAppRedisConfiguration,\
 com.alibaba.cloudapp.starter.config.configuration.NacosConfigReadServiceAutoConfiguration,\
 com.alibaba.cloudapp.starter.config.configuration.AliyunConfigManagerAutoConfiguration,\
 com.alibaba.cloudapp.starter.microservice.configuration.AliyunMicroServiceConfiguration,\
+com.alibaba.cloudapp.starter.oauth2.configuration.OAuth2PropertiesConfiguration,\
 com.alibaba.cloudapp.starter.oauth2.configuration.OAuth2AutoConfiguration, \
 com.alibaba.cloudapp.starter.datasource.configurations.RefreshableDruidDataSourceAutoConfigure, \
-com.alibaba.cloudapp.starter.oauth2.configuration.OAuth2AutoConfiguration,\
 com.alibaba.cloudapp.starter.observabilities.configurations.OpenTelemetryMetricConfiguration,\
 com.alibaba.cloudapp.starter.seata.configuration.CloudAppSeataAutoConfiguration,\
 com.alibaba.cloudapp.starter.seata.configuration.CloudAppSagaAutoConfiguration,\

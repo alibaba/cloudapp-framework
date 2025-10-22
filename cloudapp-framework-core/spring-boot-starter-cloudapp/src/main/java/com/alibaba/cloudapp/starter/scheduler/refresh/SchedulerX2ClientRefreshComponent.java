@@ -62,8 +62,8 @@ public class SchedulerX2ClientRefreshComponent extends RefreshableComponent<
     @NotNull
     private Client creatClient(SchedulerX2WorkerProperties prop) {
         try {
-            Assert.hasText(prop.getEndpoint(),
-                           "SchedulerX2 endpoint must be provided"
+            Assert.hasText(prop.getOpenAPIEndpoint(),
+                           "SchedulerX2 openapi endpoint must be provided"
             );
             Assert.hasText(prop.getRegionId(),
                            "SchedulerX2 regionId must be provided"

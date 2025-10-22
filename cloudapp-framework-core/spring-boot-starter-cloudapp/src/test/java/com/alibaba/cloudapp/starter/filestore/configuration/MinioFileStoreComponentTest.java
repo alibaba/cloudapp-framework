@@ -46,7 +46,7 @@ class MinioFileStoreComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.filestore.minio",
+        assertEquals("io.cloudapp.filestore.minio",
                      storeComponent.bindKey()
         );
     }

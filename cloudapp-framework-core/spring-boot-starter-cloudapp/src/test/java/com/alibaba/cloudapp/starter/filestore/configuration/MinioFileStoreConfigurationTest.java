@@ -2,7 +2,6 @@ package com.alibaba.cloudapp.starter.filestore.configuration;
 
 import com.alibaba.cloudapp.filestore.minio.ClientProvider;
 import com.alibaba.cloudapp.filestore.minio.service.*;
-import com.alibaba.cloudapp.filestore.minio.service.*;
 import com.alibaba.cloudapp.starter.filestore.properties.MinioEndpointProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

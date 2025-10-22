@@ -2,6 +2,7 @@ package com.alibaba.cloudapp.starter.oauth2.configuration;
 
 import com.alibaba.cloudapp.api.oauth2.AuthorizationService;
 import com.alibaba.cloudapp.api.oauth2.TokenStorageService;
+import com.alibaba.cloudapp.api.oauth2.verifier.TokenVerifier;
 import com.alibaba.cloudapp.oauth2.verifier.IntrospectionTokenVerifier;
 import com.alibaba.cloudapp.oauth2.verifier.JwtTokenVerifier;
 import com.alibaba.cloudapp.starter.oauth2.properties.OAuth2ClientProperties;
@@ -70,10 +71,10 @@ class OAuth2AutoConfigurationTest {
         properties.setEnabled(false);
         
         // Run the test
-        final JwtTokenVerifier result = configuration.jwksTokenVerifier(
-                properties);
+        final TokenVerifier result = configuration.tokenVerifier(properties);
         
         // Verify the results
+        assert result instanceof JwtTokenVerifier;
     }
     
     @Test
@@ -85,10 +86,10 @@ class OAuth2AutoConfigurationTest {
         properties.setEnabled(false);
         
         // Run the test
-        final IntrospectionTokenVerifier result = configuration.introspectionTokenVerifier(
-                properties);
+        final TokenVerifier result = configuration.tokenVerifier(properties);
         
         // Verify the results
+        assert result instanceof IntrospectionTokenVerifier;
     }
     
 }

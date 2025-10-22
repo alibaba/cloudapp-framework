@@ -44,7 +44,7 @@ class RocketRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.messaging.rocketmq",
+        assertEquals("io.cloudapp.messaging.rocketmq",
                      component.bindKey()
         );
     }

@@ -19,45 +19,31 @@
 
 package com.alibaba.cloudapp.starter.apigateway.configuration;
 
-import com.alibaba.cloudapp.api.oauth2.AuthorizationService;
-import com.alibaba.cloudapp.api.oauth2.TokenStorageService;
+import com.alibaba.cloudapp.model.OAuth2Client;
 import com.alibaba.cloudapp.oauth2.service.AuthorizationServiceImpl;
-import com.alibaba.cloudapp.oauth2.service.DefaultTokenStorageService;
 import com.alibaba.cloudapp.starter.apigateway.properties.ApiGatewayProperties;
-import org.springframework.beans.factory.annotation.Qualifier;
+import com.alibaba.cloudapp.starter.oauth2.configuration.OAuth2AutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.client.RestTemplate;
 
 @AutoConfiguration
-@ConditionalOnProperty(
-        prefix = "io.cloudapp.apigateway.aliyun.oAuth2",
-        name = {"clientId", "clientSecret"}
-)
-@ConditionalOnClass(AuthorizationServiceImpl.class)
+@ConditionalOnClass({AuthorizationServiceImpl.class, ApiGatewayProperties.class})
+@AutoConfigureBefore(OAuth2AutoConfiguration.class)
 public class ApiGatewayOAuth2Configuration {
-    @Bean("oauthTemplate")
-    @ConditionalOnMissingBean(name = "oauthTemplate")
-    public RestTemplate oauth2Template() {
-        return new RestTemplate();
-    }
     
-    @Bean("authorizationService")
-    @ConditionalOnMissingBean(name = "authorizationService")
-    public AuthorizationService authorizationService(
-            ApiGatewayProperties properties,
-            @Qualifier("oauthTemplate") RestTemplate restTemplate
-    ) {
-        return new AuthorizationServiceImpl(properties.getOAuth2(), restTemplate);
-    }
-    
-    @Bean("tokenStorageService")
-    @ConditionalOnMissingBean(name = "tokenStorageService")
-    public TokenStorageService tokenStorageService() {
-        return new DefaultTokenStorageService();
+    @Bean("oauth2Client")
+    @ConditionalOnMissingBean
+    @ConditionalOnExpression("#{environment.containsProperty(" +
+                "'io.cloudapp.apigateway.aliyun.oAuth2.clientId'" +
+            ") || environment.containsProperty(" +
+                "'io.cloudapp.apigateway.aliyun.oAuth2.client-id'" +
+            ")}")
+    public OAuth2Client oauth2Client(ApiGatewayProperties properties) {
+        return properties.getOAuth2();
     }
     
 }

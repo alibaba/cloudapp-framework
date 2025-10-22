@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: apigateway-aliyun-demo
+  main:
+    allow-bean-definition-overriding: true
+
+io:
+  cloudapp:
+    apigateway:
+      aliyun:
+        enabled: true
+        server:
+          accessKey: ${AK}
+          secretKey: ${SK}
+          gatewayUri: ${openApiUrl:csb-cop-api-biz.inter.env205.shuguang.com}
+          instanceId: ${instanceId:i-acd5c2e14bdfd2cc000}

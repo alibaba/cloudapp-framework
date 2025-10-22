@@ -21,19 +21,19 @@ package com.alibaba.cloudapp.starter.oauth2.configuration;
 
 import com.alibaba.cloudapp.api.oauth2.AuthorizationService;
 import com.alibaba.cloudapp.api.oauth2.GrantType;
+import com.alibaba.cloudapp.model.OAuth2Client;
 import com.alibaba.cloudapp.oauth2.service.AuthorizationServiceImpl;
 import com.alibaba.cloudapp.starter.base.RefreshableComponent;
-import com.alibaba.cloudapp.starter.oauth2.properties.OAuth2ClientProperties;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
 
-public class OAuth2Component extends RefreshableComponent<OAuth2ClientProperties,
+public class OAuth2Component extends RefreshableComponent<OAuth2Client,
         AuthorizationService> {
     
     public static final String BINDING_PROP_KEY = "io.cloudapp.oauth2";
     
-    public OAuth2Component(OAuth2ClientProperties properties) {
+    public OAuth2Component(OAuth2Client properties) {
         super(properties);
     }
     
@@ -81,7 +81,7 @@ public class OAuth2Component extends RefreshableComponent<OAuth2ClientProperties
     }
     
     @Override
-    protected AuthorizationService createBean(OAuth2ClientProperties properties) {
+    protected AuthorizationService createBean(OAuth2Client properties) {
         return new AuthorizationServiceImpl(properties);
     }
     

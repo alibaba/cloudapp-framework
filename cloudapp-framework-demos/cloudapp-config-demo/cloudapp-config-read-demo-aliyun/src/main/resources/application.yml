@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: config-read-aliyun-demo
+  cloud:
+    nacos:
+      config:
+        #        example value: jmenv-dncs.cn-wulan-env1-amtest1001-a.inter.env1.shuguang.com
+        server-addr: ${NACOS_SERVER_ADDR:127.0.0.1:8848}
+        import-check:
+          enabled: false
+        #          example value: 5ff2f842-22e3-473c-800a-cde6198e89ee
+        namespace: ${NACOS_NAMESPACE:}
+        #        example value: ab4288e93c0947bb8d83e9b2c24XXXXX
+        access-key: ${AK:}
+        #        example value: 18pV+LLZQYXeIO2RevDll1sXXXXX
+        secret-key: ${SK:}
+
+io:
+  cloudapp:
+    config:
+      aliyun:
+        read:
+          enabled: true
+          timeout: 5000
+          group: cloudapp

@@ -16,7 +16,10 @@
     <name>cloudapp-filestore-demo</name>
     <description>cloudapp-sequence-demo</description>
     <modules>
-        <module>cloudapp-filestore-demo-aliyun</module>
+        <module>cloudapp-filestore-bucket-demo-aliyun</module>
+        <module>cloudapp-filestore-bucket-lifecycle-demo-aliyun</module>
+        <module>cloudapp-filestore-object-demo-aliyun</module>
+        <module>cloudapp-filestore-object-policy-demo-aliyun</module>
         <module>cloudapp-filestore-autorefresh-demo-aliyun</module>
         <module>cloudapp-filestore-demo-minio</module>
     </modules>

@@ -21,7 +21,7 @@ package com.alibaba.cloudapp.sequence;
 
 public class Constants {
 
-    public static final String DEFAULT_QUEUE_NAME = "com.alibaba.cloudapp.default.queue";
+    public static final String DEFAULT_QUEUE_NAME = "io.cloudapp.default.queue";
 
     public static final String SPRING_REDIS_ROOT = "spring.redis";
 

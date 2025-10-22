@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.alibaba.cloudapp</groupId>
+        <artifactId>cloudapp-microservice-dubbo-demo</artifactId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>cloudapp-microservice-dubbo-demo-consumer</artifactId>
+    <name>cloudapp-microservice-dubbo-demo-consumer</name>
+    <description>cloudapp-microservice-dubbo-demo-consumer</description>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.alibaba.cloudapp</groupId>
+            <artifactId>cloudapp-microservice-dubbo-demo-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloudapp</groupId>
+            <artifactId>spring-boot-starter-cloudapp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.cloudapp.microservice</groupId>
+            <artifactId>cloudapp-microservice-dubbo-aliyun</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <mainClass>io.cloudapp.microservice.aliyun.demo.DubboConsumerDemoApplication</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

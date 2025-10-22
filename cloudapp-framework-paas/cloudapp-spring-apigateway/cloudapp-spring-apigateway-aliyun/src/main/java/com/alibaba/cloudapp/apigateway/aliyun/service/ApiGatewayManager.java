@@ -19,60 +19,79 @@
 
 package com.alibaba.cloudapp.apigateway.aliyun.service;
 
-import com.alibaba.cloudapp.apigateway.aliyun.properties.ApiKeyProperties;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.BasicProperties;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.JwtProperties;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
+import com.aliyuncs.CommonRequest;
+import com.aliyuncs.CommonResponse;
+import com.aliyuncs.DefaultAcsClient;
+import com.aliyuncs.IAcsClient;
+import com.aliyuncs.exceptions.ClientException;
+import com.aliyuncs.http.FormatType;
+import com.aliyuncs.http.HttpClientConfig;
+import com.aliyuncs.http.MethodType;
+import com.aliyuncs.profile.DefaultProfile;
 import com.alibaba.cloudapp.apigateway.aliyun.ApiGatewayConstant;
 import com.alibaba.cloudapp.apigateway.aliyun.AuthTypeEnum;
-import com.alibaba.cloudapp.apigateway.aliyun.properties.*;
-import com.alibaba.cloudapp.apigateway.aliyun.util.CSBSignatureUtil;
+import com.alibaba.cloudapp.apigateway.aliyun.properties.ApiKeyProperties;
+import com.alibaba.cloudapp.apigateway.aliyun.properties.BasicProperties;
+import com.alibaba.cloudapp.apigateway.aliyun.properties.JwtProperties;
 import com.alibaba.cloudapp.exeption.CloudAppException;
-import com.alibaba.cloudapp.exeption.CloudAppInvalidAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.net.URI;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * CSB APIGateway 
+ * CSB APIGateway
  */
 public class ApiGatewayManager {
-
-    private static final Logger logger = LoggerFactory.getLogger(ApiGatewayManager.class);
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(
+            ApiGatewayManager.class);
+    
     private String accessKey;
     private String secretKey;
-    private String gatewayUri;
-    private final RestTemplate restTemplate;
-    private final CSBSignatureUtil signatureUtil;
-
-    public ApiGatewayManager(String accessKey, String secretKey, String gatewayUri) {
-        this(accessKey, secretKey, gatewayUri, new RestTemplate());
-    }
-
-    public ApiGatewayManager(String accessKey,
-                             String secretKey,
-                             String gatewayUri,
-                             RestTemplate restTemplate) {
+    private String endpoint;
+    private String organizationId;
+    private String resourceGroupId;
+    private String productCode = "csb2.0";
+    private String sdkSource = "apiGateway";
+    private String regionId;
+    private boolean ssl;
+    private IAcsClient client;
+    public ApiGatewayManager(
+            String accessKey, String secretKey, String gatewayUri,
+            String regionId, String resourceGroupId, String organizationId,
+            boolean ssl
+    ) {
         this.accessKey = accessKey;
         this.secretKey = secretKey;
-        this.gatewayUri = gatewayUri;
-        this.signatureUtil = new CSBSignatureUtil(accessKey, secretKey);
-        this.restTemplate = restTemplate;
+        this.endpoint = getEndpoint(gatewayUri);
+        this.organizationId = organizationId;
+        this.resourceGroupId = resourceGroupId;
+        this.regionId = regionId;
+        this.ssl = ssl;
+        
+        initClient();
     }
-
+    
+    private void initClient() {
+        DefaultProfile profile = DefaultProfile.getProfile(
+                regionId, accessKey, secretKey);
+        HttpClientConfig clientConfig = HttpClientConfig.getDefault();
+        clientConfig.setIgnoreSSLCerts(ssl);
+        clientConfig.setConnectionTimeoutMillis(3000L);
+        clientConfig.setReadTimeoutMillis(10000L);
+        profile.setHttpClientConfig(clientConfig);
+        client = new DefaultAcsClient(profile);
+    }
+    
     public void createApiKeyConsumer(
             String name,
             String gwInstanceId,
@@ -80,64 +99,71 @@ public class ApiGatewayManager {
             ApiKeyProperties apiKey
     ) throws CloudAppException {
         JSONObject body = new JSONObject();
-
+        
         body.put("appName", name);
         body.put("authType", AuthTypeEnum.APIKEY.getType());
         body.put("gwInstanceId", gwInstanceId);
         body.put("groups", groups == null ? Collections.emptyList() : groups);
         body.put("key", apiKey.getApiKey());
-
+        
         createConsumer(body);
     }
-
+    
     public void createJwtConsumer(
-            String name, String gwInstanceId, List<String> groups, JwtProperties jwt
+            String name,
+            String gwInstanceId,
+            List<String> groups,
+            JwtProperties jwt
     ) throws CloudAppException {
         JSONObject body = new JSONObject();
         body.put("appName", name);
         body.put("authType", AuthTypeEnum.JWT.getType());
         body.put("gwInstanceId", gwInstanceId);
         body.put("groups", groups == null ? Collections.emptyList() : groups);
-
+        
         body.put("key", jwt.getKeyId());
         body.put("appSecret", jwt.getSecret());
         body.put("expireTime", jwt.getExpiredSecond() * 1000);
         Map<String, String> payload = new HashMap<>(4);
-
+        
         payload.put("issuer", jwt.getIssuer());
         payload.put("subject", jwt.getSubject());
-
+        
         body.put("payload", payload);
         createConsumer(body);
     }
-
+    
     public void createBasicConsumer(
-            String name, String gwInstanceId, List<String> groups, BasicProperties basic
+            String name,
+            String gwInstanceId,
+            List<String> groups,
+            BasicProperties basic
     ) throws CloudAppException {
         JSONObject body = new JSONObject();
         body.put("appName", name);
         body.put("authType", AuthTypeEnum.BASIC.getType());
         body.put("gwInstanceId", gwInstanceId);
         body.put("groups", groups == null ? Collections.emptyList() : groups);
-
+        
         body.put("key", basic.getUsername());
         body.put("password", basic.getPassword());
-
+        
         createConsumer(body);
     }
-
+    
     private void createConsumer(JSONObject body) throws CloudAppException {
         try {
-            RequestEntity<String> request = initRequestEntity(HttpMethod.POST,
+            CommonResponse response = requestServer(
                     ApiGatewayConstant.CREATE_CONSUMER_URL,
-                    null,
-                    body,
-                    MediaType.APPLICATION_JSON);
-            ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-
-            if(response.getStatusCode().equals(HttpStatus.OK)) {
-                if(logger.isDebugEnabled()) {
-                    logger.debug("create consumer response: {}", response.getBody());
+                    MethodType.POST,
+                    body
+            );
+            
+            if (response.getHttpResponse().isSuccess()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("create consumer response: {}",
+                                 response.getData()
+                    );
                 }
             } else {
                 throw new CloudAppException("CloudApp.CreateConsumerFailed");
@@ -146,15 +172,17 @@ public class ApiGatewayManager {
             throw new CloudAppException("create consumer failed", e);
         }
     }
-
+    
     /**
      * Check consumer exists
-     * @param name api gateway name
+     *
+     * @param name         api gateway name
      * @param gwInstanceId api gateway instance id
      * @return true if app exists, false otherwise
      * @throws CloudAppException if check app exists failed
      */
-    public boolean checkConsumerExists(String name, String gwInstanceId) throws CloudAppException {
+    public boolean checkConsumerExists(String name, String gwInstanceId)
+            throws CloudAppException {
         try {
             Map<String, Object> params = new HashMap<>(8);
             params.put("appName", name);
@@ -162,25 +190,28 @@ public class ApiGatewayManager {
             params.put("activeSearchName", "appName");
             params.put("current", 1);
             params.put("size", 20);
-
-            RequestEntity<String> request = initRequestEntity(HttpMethod.POST,
+            
+            CommonResponse response = requestServer(
                     ApiGatewayConstant.LIST_CONSUMER_URL,
-                    null,
-                    params,
-                    MediaType.APPLICATION_JSON);
-            ResponseEntity<String> response = restTemplate.exchange(request, String.class);
-
-            if(response.getStatusCode().equals(HttpStatus.OK)) {
-
-                if(logger.isDebugEnabled()) {
-                    logger.debug("list consumer response: {}", response.getBody());
+                    MethodType.POST,
+                    params
+            );
+            
+            if (response.getHttpResponse().isSuccess()) {
+                
+                if (logger.isDebugEnabled()) {
+                    logger.debug("list consumer response: {}",
+                                 response.getData()
+                    );
                 }
-
-                JSONObject result = JSON.parseObject(response.getBody());
-                JSONArray dataList = result == null || result.get("data") == null ?
-                        new JSONArray() : result.getJSONObject("data").getJSONArray("records");
-                if(dataList != null && !dataList.isEmpty()) {
-
+                
+                JSONObject result = JSON.parseObject(response.getData());
+                JSONArray dataList = result == null || result.get(
+                        "data") == null ?
+                        new JSONArray() : result.getJSONObject("data")
+                                                .getJSONArray("records");
+                if (dataList != null && !dataList.isEmpty()) {
+                    
                     return dataList.stream().anyMatch(e -> {
                         JSONObject app = (JSONObject) JSON.toJSON(e);
                         return app.getString("appName").equals(name);
@@ -188,60 +219,56 @@ public class ApiGatewayManager {
                 }
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("list consumer response status code: {}", response.getStatusCode());
+                    logger.debug("list consumer response status code: {}",
+                                 response.getHttpStatus()
+                    );
                 }
             }
             return false;
         } catch (Exception e) {
             throw new CloudAppException("check app exists failed",
-                    "CloudApp.AppAlreadyExisted", e);
+                                        "CloudApp.AppAlreadyExisted", e
+            );
         }
     }
-
-    /**
-     * Init request, Add signature to request header
-     * @param method request method
-     * @param path   uri path
-     * @param query  query parameters
-     * @param body   request body
-     * @return   new request entity
-     * @throws NoSuchAlgorithmException algorithm invalid
-     * @throws InvalidKeyException secret invalid
-     */
-    public RequestEntity<String> initRequestEntity(HttpMethod method,
-                                            String path,
-                                            Map<String, String> query,
-                                            Map<String, Object> body,
-                                                   MediaType type
-    ) throws NoSuchAlgorithmException, InvalidKeyException, CloudAppInvalidAccessException {
-
-        if(!StringUtils.hasText(accessKey) || !StringUtils.hasText(secretKey)) {
-            throw new CloudAppInvalidAccessException("Invalid access key or secret key!");
+    
+    public CommonResponse requestServer(
+            String path, MethodType method, Map<String, Object> params
+    ) throws ClientException {
+        CommonRequest request = new CommonRequest();
+        request.setSysUriPattern(path);
+        request.setHttpContent(
+                JSONObject.toJSONString(params).getBytes(StandardCharsets.UTF_8),
+                "UTF-8", FormatType.JSON
+        );
+        request.setSysDomain(endpoint);
+        request.setSysProduct(productCode);
+        request.setSysVersion("2023-02-06");
+        request.putHeadParameter("x-acs-caller-sdk-source", sdkSource);
+        request.putHeadParameter("x-acs-resourcegroupid", resourceGroupId);
+        request.putHeadParameter("x-acs-organizationid", organizationId);
+//       request.putHeadParameter("x-acs-caller-type", "custo");
+//      request.putHeaderParameter("x-acs-roleId", settingInfo.getResourceGroupId());
+        
+        request.setSysMethod(method);
+        return client.getCommonResponse(request);
+    }
+    
+    private String getEndpoint(String gatewayUrl) {
+        if(!StringUtils.hasText(gatewayUrl)) {
+            throw new IllegalArgumentException("gatewayUri is empty");
         }
-
-        long time = System.currentTimeMillis();
-        String sign = signatureUtil.getQuerySign(method.name(), path, query, body, time, type);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(ApiGatewayConstant.HEADER_ACCESS_KEY, accessKey);
-        headers.add(ApiGatewayConstant.HEADER_CSB_OPENID, ApiGatewayConstant.CSB_OPENAPI);
-        headers.add(ApiGatewayConstant.HEADER_REQUEST_TIME, String.valueOf(time));
-        headers.add(ApiGatewayConstant.HEADER_SIGN, sign);
-        headers.setContentType(type);
-
-        StringBuilder urlBuilder = new StringBuilder(path);
-
-        if (query != null && !query.isEmpty()) {
-            urlBuilder.append("?");
-            query.forEach((k, v) -> urlBuilder.append(k).append("=").append(v).append("&"));
-            urlBuilder.deleteCharAt(urlBuilder.length() - 1);
-        } else {
-            logger.info("query is empty");
+        if(gatewayUrl.startsWith("http")) {
+            gatewayUrl =  endpoint.replaceFirst("https?://", "");
         }
-
-        URI uri = URI.create(gatewayUri + urlBuilder);
-
-        return new RequestEntity<>(JSON.toJSONString(body), headers, method, uri);
+        if(gatewayUrl.contains("/")) {
+            gatewayUrl = gatewayUrl.split("/")[0];
+        }
+        return gatewayUrl;
+    }
+    
+    public void refresh() {
+        initClient();
     }
     
     public String getAccessKey() {
@@ -260,12 +287,59 @@ public class ApiGatewayManager {
         this.secretKey = secretKey;
     }
     
-    public String getGatewayUri() {
-        return gatewayUri;
+    public String getEndpoint() {
+        return endpoint;
     }
     
-    public void setGatewayUri(String gatewayUri) {
-        this.gatewayUri = gatewayUri;
+    public void setEndpoint(String gatewayUri) {
+        this.endpoint = getEndpoint(gatewayUri);
     }
     
+    public String getOrganizationId() {
+        return organizationId;
+    }
+    
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+    
+    public String getResourceGroupId() {
+        return resourceGroupId;
+    }
+    
+    public void setResourceGroupId(String resourceGroupId) {
+        this.resourceGroupId = resourceGroupId;
+    }
+    
+    public String getProductCode() {
+        return productCode;
+    }
+    
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+    
+    public String getSdkSource() {
+        return sdkSource;
+    }
+    
+    public void setSdkSource(String sdkSource) {
+        this.sdkSource = sdkSource;
+    }
+    
+    public boolean isSsl() {
+        return ssl;
+    }
+    
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
+    }
+    
+    public String getRegionId() {
+        return regionId;
+    }
+    
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
+    }
 }

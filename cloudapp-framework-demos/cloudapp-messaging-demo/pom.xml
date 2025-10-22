@@ -17,6 +17,9 @@
     <description>cloudapp-messaging-demo</description>
     <modules>
         <module>cloudapp-messaging-kafka-demo</module>
+        <module>cloudapp-messaging-kafka-plaintext-demo</module>
+        <module>cloudapp-messaging-kafka-sasl-ssl-demo</module>
+        <module>cloudapp-messaging-kafka-sasl-plaintext-demo</module>
         <module>cloudapp-messaging-rocketmq-demo</module>
     </modules>
 

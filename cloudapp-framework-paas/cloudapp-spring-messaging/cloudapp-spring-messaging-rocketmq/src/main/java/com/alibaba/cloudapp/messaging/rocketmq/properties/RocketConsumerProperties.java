@@ -19,194 +19,222 @@
 
 package com.alibaba.cloudapp.messaging.rocketmq.properties;
 
-import com.alibaba.cloudapp.messaging.rocketmq.model.RocketDestination;
-import org.apache.rocketmq.spring.annotation.MessageModel;
-import org.apache.rocketmq.spring.annotation.SelectorType;
-import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
+import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RocketConsumerProperties {
-
+    
     private String accessChannel;
-
+    
     private String group;
-
+    
     private MessageModel messageModel = MessageModel.CLUSTERING;
-
+    
     private int pullBatchSize = 10;
-
+    
     private String namespace;
-
+    
     private String name;
-
+    
     private String topic;
-
+    
     private List<String> tags = new ArrayList<>();
-
+    
     private String nameServer;
-
+    
     private String username;
-
+    
     private String password;
-
+    
     private boolean useTLS = false;
-
+    
     private Boolean enableMsgTrace;
-
+    
     private String traceTopic;
-
+    
     private String type;
-
+    
+    private String securityToken;
+    private int threadNum = 10;
+    private int suspendTimeMillis = 30000;
+    private int maxTimeout = 30000;
+    private boolean vipChannelEnable = false;
+    
     private boolean isDefault = false;
-
+    
     public String getType() {
         return type;
     }
-
+    
     public void setType(String type) {
         this.type = type;
     }
-
+    
     public String getAccessChannel() {
         return accessChannel;
     }
-
+    
     public void setAccessChannel(String accessChannel) {
         this.accessChannel = accessChannel;
     }
-
+    
     public String getGroup() {
         return group;
     }
-
+    
     public void setGroup(String group) {
         this.group = group;
     }
-
+    
     public MessageModel getMessageModel() {
         return messageModel;
     }
-
+    
     public void setMessageModel(MessageModel messageModel) {
         this.messageModel = messageModel;
     }
-
+    
     public int getPullBatchSize() {
         return pullBatchSize;
     }
-
+    
     public void setPullBatchSize(int pullBatchSize) {
         this.pullBatchSize = pullBatchSize;
     }
-
-
+    
+    
     public String getNamespace() {
         return namespace;
     }
-
+    
     public void setNamespace(String namespace) {
         this.namespace = namespace;
     }
-
+    
     public String getName() {
         return name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }
-
+    
     public String getTopic() {
         return topic;
     }
-
+    
     public void setTopic(String topic) {
         this.topic = topic;
     }
-
+    
     public List<String> getTags() {
         return tags;
     }
-
+    
     public void setTags(List<String> tags) {
         this.tags = tags;
     }
-
+    
     public String getNameServer() {
         return nameServer;
     }
-
+    
     public void setNameServer(String nameServer) {
         this.nameServer = nameServer;
     }
-
+    
     public String getUsername() {
         return username;
     }
-
+    
     public void setUsername(String username) {
         this.username = username;
     }
-
+    
     public String getPassword() {
         return password;
     }
-
+    
     public void setPassword(String password) {
         this.password = password;
     }
-
+    
     public boolean isUseTLS() {
         return useTLS;
     }
-
+    
     public void setUseTLS(boolean useTLS) {
         this.useTLS = useTLS;
     }
-
+    
     public Boolean isEnableMsgTrace() {
         return enableMsgTrace;
     }
-
+    
     public void setEnableMsgTrace(Boolean enableMsgTrace) {
         this.enableMsgTrace = enableMsgTrace;
     }
-
+    
     public String getTraceTopic() {
         return traceTopic;
     }
-
+    
     public void setTraceTopic(String traceTopic) {
         this.traceTopic = traceTopic;
     }
-
+    
     public boolean isDefault() {
         return isDefault;
     }
-
+    
     public void setDefault(boolean isDefault) {
         this.isDefault = isDefault;
     }
-
-    public RocketMQProperties.PullConsumer toRocketMqProperty() {
-        RocketMQProperties.PullConsumer consumer = new RocketMQProperties.PullConsumer();
-        consumer.setAccessKey(username);
-        consumer.setSecretKey(password);
-        consumer.setGroup(group);
-        consumer.setInstanceName(name);
-        consumer.setCustomizedTraceTopic(traceTopic);
-        consumer.setEnableMsgTrace(enableMsgTrace);
-        consumer.setMessageModel(messageModel.name());
-        consumer.setNamespace(namespace);
-        consumer.setPullBatchSize(pullBatchSize);
-        RocketDestination destination = new RocketDestination(topic, tags);
-        consumer.setSelectorType(SelectorType.TAG.name());
-        consumer.setSelectorExpression(destination.getTagsString());
-        consumer.setTopic(topic);
-        consumer.setTlsEnable(useTLS);
-        return consumer;
+    
+    public Boolean getEnableMsgTrace() {
+        return enableMsgTrace;
     }
-
+    
+    public String getSecurityToken() {
+        return securityToken;
+    }
+    
+    public void setSecurityToken(String securityToken) {
+        this.securityToken = securityToken;
+    }
+    
+    public int getThreadNum() {
+        return threadNum;
+    }
+    
+    public void setThreadNum(int threadNum) {
+        this.threadNum = threadNum;
+    }
+    
+    public int getSuspendTimeMillis() {
+        return suspendTimeMillis;
+    }
+    
+    public void setSuspendTimeMillis(int suspendTimeMillis) {
+        this.suspendTimeMillis = suspendTimeMillis;
+    }
+    
+    public int getMaxTimeout() {
+        return maxTimeout;
+    }
+    
+    public void setMaxTimeout(int maxTimeout) {
+        this.maxTimeout = maxTimeout;
+    }
+    
+    public boolean isVipChannelEnable() {
+        return vipChannelEnable;
+    }
+    
+    public void setVipChannelEnable(boolean vipChannelEnable) {
+        this.vipChannelEnable = vipChannelEnable;
+    }
+    
 }

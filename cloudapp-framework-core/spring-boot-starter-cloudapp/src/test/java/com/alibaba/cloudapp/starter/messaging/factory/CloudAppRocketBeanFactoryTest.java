@@ -135,20 +135,20 @@ class CloudAppRocketBeanFactoryTest {
         // Setup
         final MockEnvironment environment = new MockEnvironment();
         
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.nameServer", "nameServer");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.username", "username");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.password", "password");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.useTLS", "false");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.enableMsgTrace", "false");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.traceTopic", "traceTopic");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.accessChannel", "accessChannel");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].type", "type");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].nameServer", "nameServer");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].username", "username");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].password", "password");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].useTLS", "false");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].enableMsgTrace", "false");
-        environment.setProperty("com.alibaba.cloudapp.messaging.rocketmq.inputs[0].traceTopic", "traceTopic");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.nameServer", "nameServer");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.username", "username");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.password", "password");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.useTLS", "false");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.enableMsgTrace", "false");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.traceTopic", "traceTopic");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.accessChannel", "accessChannel");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].type", "type");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].nameServer", "nameServer");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].username", "username");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].password", "password");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].useTLS", "false");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].enableMsgTrace", "false");
+        environment.setProperty("io.cloudapp.messaging.rocketmq.inputs[0].traceTopic", "traceTopic");
         
         // Run the test
         rocketBeanFactory.setEnvironment(environment);

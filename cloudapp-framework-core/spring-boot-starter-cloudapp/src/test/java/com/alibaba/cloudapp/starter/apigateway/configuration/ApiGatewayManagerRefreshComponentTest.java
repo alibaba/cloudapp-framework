@@ -45,7 +45,7 @@ public class ApiGatewayManagerRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.apigateway.aliyun.server",
+        assertEquals("io.cloudapp.apigateway.aliyun.server",
                      apiGatewayManagerRefreshComponentUnderTest.bindKey()
         );
     }

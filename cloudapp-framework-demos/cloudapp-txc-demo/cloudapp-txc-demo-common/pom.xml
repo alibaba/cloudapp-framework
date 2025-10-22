@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>cloudapp-txc-demo</artifactId>
+        <groupId>com.alibaba.cloudapp</groupId>
+        <version>${revision}</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>cloudapp-txc-demo-common</artifactId>
+    <version>${revision}</version>
+    <name>cloudapp-txc-demo-common</name>
+    <packaging>pom</packaging>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-client</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-common</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-resourcemanager</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-rpc</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-client-springcloud</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-datasource</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-datasource-common</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.taobao.txc</groupId>
+            <artifactId>txc-datasource-cobar</artifactId>
+            <version>${gts.sdk.version}</version>
+        </dependency>
+    </dependencies>
+
+
+    <repositories>
+        <repository>
+            <id>edas-repository</id>
+            <name>EDAS Repository</name>
+            <url>https://edas-public.oss-cn-hangzhou.aliyuncs.com/repository</url>
+            <releases>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+
+
+</project>

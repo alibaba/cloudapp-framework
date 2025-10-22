@@ -19,45 +19,25 @@
 
 package com.alibaba.cloudapp.messaging.rocketmq.demo.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.cloudapp.messaging.rocketmq.CloudAppRocketConsumer;
-import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
+import com.alibaba.cloudapp.messaging.rocketmq.demo.service.RocketDemoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.annotation.PostConstruct;
 
 @RestController
 public class RocketConsumerDemoController {
 
-//    static ThreadLocal<Producer> threadLocal = new ThreadLocal<>();
+    private static final Logger logger = LoggerFactory.getLogger(
+            RocketConsumerDemoController.class);
 
-    private static final Logger logger = LoggerFactory.getLogger(RocketConsumerDemoController.class);
+    @Autowired
+    private RocketDemoService service;
     
-    @Autowired
-    private RocketMQProperties rocketMQProperties;
-
-    @Autowired
-    @Qualifier("rocketConsumer")
-    CloudAppRocketConsumer cloudAppRocketConsumer;
-
     @RequestMapping("/testRocketConsumer")
     public void testRocketConsumer() {
-        MessageExt message = cloudAppRocketConsumer.pull("test-topic");
-        logger.info("receive message: {}", message);
+       service.pullMsg();
     }
     
-    
-
-
-    @PostConstruct
-    public void init() {
-        logger.info("current properties is: {}",
-                    JSON.toJSONString(rocketMQProperties));
-    }
 }

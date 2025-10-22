@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration>
+	<!-- 控制台输出日志 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%date [TXC] [%thread] %-5level %logger{80} - %msg%n</Pattern>
+		</layout>
+	</appender>
+
+	<appender name="FILE_SERVER"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${user.dir}/logs/txc/txc_server.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>${user.dir}/logs/txc/txc_server.%i.log</FileNamePattern>
+			<MinIndex>1</MinIndex>
+			<MaxIndex>20</MaxIndex>
+		</rollingPolicy>
+		<triggeringPolicy
+			class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<MaxFileSize>1MB</MaxFileSize>
+		</triggeringPolicy>
+		<layout class="ch.qos.logback.classic.PatternLayout">
+			<Pattern>%date [TXC] [%thread] %-5level %logger{80} - %msg%n</Pattern>
+		</layout>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="FILE_SERVER" />
+		<appender-ref ref="STDOUT" />
+	</root>
+</configuration> 

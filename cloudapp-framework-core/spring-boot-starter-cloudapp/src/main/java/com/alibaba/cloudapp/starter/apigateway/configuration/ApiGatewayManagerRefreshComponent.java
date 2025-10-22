@@ -22,6 +22,7 @@ package com.alibaba.cloudapp.starter.apigateway.configuration;
 import com.alibaba.cloudapp.apigateway.aliyun.service.ApiGatewayManager;
 import com.alibaba.cloudapp.starter.apigateway.properties.ApiGatewayManagerProperties;
 import com.alibaba.cloudapp.starter.base.RefreshableComponent;
+import org.springframework.util.StringUtils;
 
 public class ApiGatewayManagerRefreshComponent extends
         RefreshableComponent<ApiGatewayManagerProperties, ApiGatewayManager> {
@@ -36,7 +37,14 @@ public class ApiGatewayManagerRefreshComponent extends
     public void postStart() {
         bean.setAccessKey(properties.getAccessKey());
         bean.setSecretKey(properties.getSecretKey());
-        bean.setGatewayUri(properties.getGatewayUri());
+        bean.setEndpoint(properties.getGatewayUri());
+        bean.setRegionId(properties.getRegionId());
+        bean.setResourceGroupId(properties.getResourceGroupId());
+        bean.setOrganizationId(properties.getOrganizationId());
+        bean.setSsl(properties.isSsl());
+        bean.setProductCode(properties.getProductCode());
+        bean.setSdkSource(properties.getSdkSource());
+        bean.refresh();
     }
     
     @Override
@@ -57,11 +65,22 @@ public class ApiGatewayManagerRefreshComponent extends
     
     @Override
     protected ApiGatewayManager createBean(ApiGatewayManagerProperties properties) {
-        return new ApiGatewayManager(
+        ApiGatewayManager manamger = new ApiGatewayManager(
                 properties.getAccessKey(),
                 properties.getSecretKey(),
-                properties.getGatewayUri()
+                properties.getGatewayUri(),
+                properties.getRegionId(),
+                properties.getResourceGroupId(),
+                properties.getOrganizationId(),
+                properties.isSsl()
         );
+        if(StringUtils.hasText(properties.getProductCode())) {
+            manamger.setProductCode(properties.getProductCode());
+        }
+        if(StringUtils.hasText(properties.getSdkSource())) {
+            manamger.setSdkSource(properties.getSdkSource());
+        }
+        return manamger;
     }
     
     

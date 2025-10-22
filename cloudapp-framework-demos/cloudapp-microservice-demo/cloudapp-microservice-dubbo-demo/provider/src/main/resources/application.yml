@@ -1,0 +1,29 @@
+server:
+  port: 8011
+
+dubbo:
+  application:
+    name: cloudapp-microservice-dubbo-demo-provider
+  registry:
+    address: nacos://127.0.0.1:8848
+  metadata-report:
+    address: nacos://127.0.0.1:8848
+  config-center:
+    address: nacos://127.0.0.1:8848
+  scan:
+    base-packages: io.cloudapp.microservice.aliyun.demo
+  protocol:
+    port: 20081
+
+spring:
+  cloud:
+    nacos:
+      config:
+        import-check:
+          enabled: false
+  application:
+    name: cloudapp-microservice-dubbo-demo-provider
+
+alicloud:
+  deployment:
+    mode: EDAS_MANAGED

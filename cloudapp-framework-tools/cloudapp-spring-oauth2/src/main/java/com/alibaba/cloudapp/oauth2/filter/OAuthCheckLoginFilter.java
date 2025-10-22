@@ -66,7 +66,7 @@ public class OAuthCheckLoginFilter implements Filter, Ordered {
             throws IOException, ServletException {
         
         if (!(servletRequest instanceof HttpServletRequest)
-                || isSkipUrl(servletRequest.getServletContext().getContextPath())) {
+                || isSkipUrl(((HttpServletRequest) servletRequest).getRequestURI())) {
             filterChain.doFilter(servletRequest, servletResponse);
             return;
         }

@@ -29,6 +29,12 @@ public class ApiGatewayManagerProperties extends RefreshableProperties {
     private String accessKey;
     private String secretKey;
     private String gatewayUri;
+    private String regionId;
+    private String resourceGroupId;
+    private String organizationId;
+    private String productCode;
+    private String sdkSource;
+    private boolean ssl = false;
 
     public String getAccessKey() {
         return accessKey;
@@ -53,5 +59,53 @@ public class ApiGatewayManagerProperties extends RefreshableProperties {
     public void setGatewayUri(String gatewayUri) {
         this.gatewayUri = gatewayUri;
     }
-
+    
+    public String getRegionId() {
+        return regionId;
+    }
+    
+    public void setRegionId(String regionId) {
+        this.regionId = regionId;
+    }
+    
+    public String getResourceGroupId() {
+        return resourceGroupId;
+    }
+    
+    public void setResourceGroupId(String resourceGroupId) {
+        this.resourceGroupId = resourceGroupId;
+    }
+    
+    public String getOrganizationId() {
+        return organizationId;
+    }
+    
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+    
+    public boolean isSsl() {
+        return ssl;
+    }
+    
+    public void setSsl(boolean ssl) {
+        this.ssl = ssl;
+    }
+    
+    public String getProductCode() {
+        return productCode;
+    }
+    
+    public void setProductCode(String productCode) {
+        this.productCode = productCode;
+    }
+    
+    public String getSdkSource() {
+        return sdkSource;
+    }
+    
+    public void setSdkSource(String sdkSource) {
+        this.sdkSource = sdkSource;
+    }
+    
 }

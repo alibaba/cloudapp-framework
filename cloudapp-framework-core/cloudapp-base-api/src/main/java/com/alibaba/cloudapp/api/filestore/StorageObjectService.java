@@ -44,7 +44,7 @@ public interface StorageObjectService<Client> extends StorageClientAware<Client>
      * </p>
      * This configuration could be set in the configuration file. via key:
      * <p>
-     * "com.alibaba.cloudapp.filestore.default.content-type"
+     * "io.cloudapp.filestore.default.content-type"
 	 * </p>
      */
     String DEFAULT_CONTENT_TYPE = "application/octet-stream";

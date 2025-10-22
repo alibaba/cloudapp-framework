@@ -72,8 +72,9 @@ public class OSSStorageObjectServiceSit {
     @Test
     public void testCopy() throws CloudAppException {
         String targetPath = "dirbyapi/test2.txt";
+        String targetBucket = "testoss987";
 //        boolean result = ossStorageObjectService.copy(BUCKET_NAME, OBJECT_PATH, targetPath, false);
-        boolean result = ossStorageObjectService.copy(BUCKET_NAME, OBJECT_PATH,
+        boolean result = ossStorageObjectService.copy(BUCKET_NAME, OBJECT_PATH, targetBucket,
                                                       targetPath, true
         );
         logger.info("Copy object result is: {}", result);

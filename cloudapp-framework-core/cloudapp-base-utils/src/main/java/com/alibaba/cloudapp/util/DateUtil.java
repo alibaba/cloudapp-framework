@@ -80,13 +80,13 @@ public class DateUtil {
     public static int calculateDifferenceMonth(final String startDate, final String endDate) {
         int length;
         if (startDate.length() != 6 && startDate.length() != 8) {
-            new IllegalArgumentException("start date is not illegal, Only accept" +
-                    " dates in the format 'yyyyMM' | 'yyyyMMdd'");
+            throw new IllegalArgumentException("start date is not illegal, " +
+                    "Only accept dates in the format 'yyyyMM' | 'yyyyMMdd'");
         }
 
         if (endDate.length() != 6 && endDate.length() != 8) {
-            new IllegalArgumentException("end date is not illegal, Only accept " +
-                    "dates in the format 'yyyyMM' | 'yyyyMMdd'");
+            throw new IllegalArgumentException("end date is not illegal, Only accept"
+                    + " dates in the format 'yyyyMM' | 'yyyyMMdd'");
         }
 
         final int dealYearInt = Integer.parseInt(startDate.substring(0, 4));

@@ -57,7 +57,6 @@ public class CloudAppRocketProducerTest {
                 return mockProducer;
             }
         };
-        producer.producer = mockProducer;
     }
 
     @Test
@@ -207,6 +206,7 @@ public class CloudAppRocketProducerTest {
     @Test
     public void testRefresh() throws MQClientException {
         RocketProducerProperties newProperties = mock(RocketProducerProperties.class);
+        producer.setStarted(true);
         producer.refresh(newProperties);
         verify(mockProducer).shutdown();
         verify(mockProducer).start();

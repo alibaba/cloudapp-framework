@@ -41,7 +41,7 @@ class RedisRefreshableComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.redis",
+        assertEquals("io.cloudapp.redis",
                      component.bindKey()
         );
     }

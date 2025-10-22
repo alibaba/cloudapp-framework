@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: hsf-pandora-boot-provider
+  hsf:
+    version: 1.0.0
+    timeout: 3000
+
+server:
+  port: 18081

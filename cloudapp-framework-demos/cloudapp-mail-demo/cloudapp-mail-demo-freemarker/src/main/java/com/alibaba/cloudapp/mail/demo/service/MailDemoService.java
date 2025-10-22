@@ -44,7 +44,7 @@ public class MailDemoService {
     private TemplateEmailService templateEmailService;
     
     // get config from application.yml
-    @Value("${com.alibaba.cloudapp.mail.username}")
+    @Value("${io.cloudapp.mail.username}")
     private String from;
     
     private JavaMailSender mailSender;

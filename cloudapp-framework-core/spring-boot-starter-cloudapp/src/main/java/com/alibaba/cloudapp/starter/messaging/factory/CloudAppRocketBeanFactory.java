@@ -19,6 +19,9 @@
 
 package com.alibaba.cloudapp.starter.messaging.factory;
 
+import com.aliyun.openservices.shade.com.alibaba.rocketmq.client.consumer.MQPullConsumer;
+import com.aliyun.openservices.shade.com.alibaba.rocketmq.client.exception.MQClientException;
+import com.aliyun.openservices.shade.com.alibaba.rocketmq.client.producer.MQProducer;
 import com.alibaba.cloudapp.api.messaging.model.ConsumerType;
 import com.alibaba.cloudapp.exeption.CloudAppException;
 import com.alibaba.cloudapp.messaging.rocketmq.CloudAppRocketConsumer;
@@ -26,13 +29,7 @@ import com.alibaba.cloudapp.messaging.rocketmq.CloudAppRocketProducer;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketConsumerProperties;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketProducerProperties;
 import com.alibaba.cloudapp.starter.messaging.properties.CloudAppRocketProperties;
-import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
-import org.apache.rocketmq.client.consumer.LitePullConsumer;
-import org.apache.rocketmq.client.exception.MQClientException;
-import org.apache.rocketmq.client.producer.DefaultMQProducer;
-import org.apache.rocketmq.client.producer.MQProducer;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.apache.rocketmq.spring.support.RocketMQMessageConverter;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -101,10 +98,10 @@ public class CloudAppRocketBeanFactory implements BeanFactoryPostProcessor,
     }
     
     @Override
-    public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
+    public void postProcessBeanFactory(@NotNull ConfigurableListableBeanFactory beanFactory)
             throws BeansException {
         MQProducer defaultProducer = null;
-        LitePullConsumer defaultConsumer = null;
+        MQPullConsumer defaultConsumer = null;
         this.beanFactory = beanFactory;
         
         try {
@@ -175,36 +172,6 @@ public class CloudAppRocketBeanFactory implements BeanFactoryPostProcessor,
         }
     }
     
-    private static void createTemplateBean(ConfigurableListableBeanFactory beanFactory,
-                                           MQProducer defaultProducer,
-                                           LitePullConsumer defaultConsumer)
-            throws Exception {
-        
-        RocketMQMessageConverter messageConverter;
-        if (beanFactory.containsBean("rocketMQMessageConverter")) {
-            messageConverter = (RocketMQMessageConverter) beanFactory.getBean(
-                    "rocketMQMessageConverter");
-        } else {
-            messageConverter = new RocketMQMessageConverter();
-            beanFactory.registerSingleton("rocketMQMessageConverter",
-                                          messageConverter
-            );
-        }
-        
-        RocketMQTemplate rocketMQTemplate = new RocketMQTemplate();
-        rocketMQTemplate.afterPropertiesSet();
-        if (defaultProducer != null) {
-            rocketMQTemplate.setProducer((DefaultMQProducer) defaultProducer);
-        }
-        if (defaultConsumer != null) {
-            rocketMQTemplate.setConsumer(
-                    (DefaultLitePullConsumer) defaultConsumer);
-        }
-        rocketMQTemplate.setMessageConverter(
-                messageConverter.getMessageConverter());
-        beanFactory.registerSingleton("rocketMQTemplate", rocketMQTemplate);
-    }
-    
     private void initProducerProperties(CloudAppRocketProperties properties,
                                         RocketProducerProperties output) {
         if (!StringUtils.hasText(output.getNameServer())) {
@@ -271,7 +238,7 @@ public class CloudAppRocketBeanFactory implements BeanFactoryPostProcessor,
     }
     
     @Override
-    public void setEnvironment(Environment environment)
+    public void setEnvironment(@NotNull Environment environment)
             throws BeansException {
         
         this.environment = environment;

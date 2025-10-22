@@ -29,6 +29,7 @@
 
         <slf4j.version>1.7.25</slf4j.version>
         <fastjson2.version>2.0.53</fastjson2.version>
+        <fj.nonautotype.version>1.2.83_noneautotype</fj.nonautotype.version>
         <servlet-api.version>4.0.1</servlet-api.version>
         <aspectjrt.version>1.9.7</aspectjrt.version>
         <validation.version>2.0.1.Final</validation.version>
@@ -55,8 +56,7 @@
         <jwt-rsa.version>0.22.1</jwt-rsa.version>
         <java-jwt.version>4.4.0</java-jwt.version>
         <arms-sdk.version>1.7.3</arms-sdk.version>
-        <rocketmq.version>5.0.7</rocketmq.version>
-        <rocketmq-aliyun.version>1.0.12</rocketmq-aliyun.version>
+        <rocketmq-aliyun.version>1.8.5.Final</rocketmq-aliyun.version>
         <spring-rocketmq.version>2.3.0</spring-rocketmq.version>
         <elasticsearch-java.version>8.15.0</elasticsearch-java.version>
         <elasticsearch-rest-client.version>8.15.0</elasticsearch-rest-client.version>
@@ -79,6 +79,8 @@
         <bcprov-jdk18on.version>1.78</bcprov-jdk18on.version>
 
         <mysql-connector-java.version>8.2.0</mysql-connector-java.version>
+        <pandora.version>2019-06-stable</pandora.version>
+        <edas-sdk.version>1.8.3</edas-sdk.version>
     </properties>
 
     <dependencyManagement>
@@ -88,20 +90,22 @@
                 <artifactId>fastjson2</artifactId>
                 <version>${fastjson2.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fj.nonautotype.version}</version>
+            </dependency>
             <!-- =================== alibaba cloud ====================== -->
             <dependency>
                 <groupId>com.aliyun.oss</groupId>
                 <artifactId>aliyun-sdk-oss</artifactId>
                 <version>${aliyun-oss.version}</version>
             </dependency>
-            <!--
             <dependency>
                 <groupId>com.alibaba.arms.apm</groupId>
                 <artifactId>arms-sdk</artifactId>
                 <version>${arms-sdk.version}</version>
             </dependency>
-            -->
 
             <dependency>
                 <groupId>com.alibaba.nacos</groupId>
@@ -268,6 +272,16 @@
             </dependency>
             <dependency>
                 <groupId>com.alibaba.cloudapp.microservice</groupId>
+                <artifactId>cloudapp-microservice-hsf-aliyun</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloudapp.microservice</groupId>
+                <artifactId>cloudapp-microservice-hsf-war-aliyun</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloudapp.microservice</groupId>
                 <artifactId>cloudapp-microservice-aliyun-common</artifactId>
                 <version>${revision}</version>
             </dependency>
@@ -287,6 +301,12 @@
             <dependency>
                 <groupId>com.alibaba.cloudapp</groupId>
                 <artifactId>cloudapp-spring-messaging-rabbitmq</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloudapp</groupId>
+                <artifactId>cloudapp-spring-rocketmq-aliyun</artifactId>
                 <version>${revision}</version>
             </dependency>
 
@@ -395,9 +415,15 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.rocketmq</groupId>
-                <artifactId>rocketmq-client-java</artifactId>
-                <version>${rocketmq.version}</version>
+                <groupId>com.aliyun.openservices</groupId>
+                <artifactId>ons-client</artifactId>
+                <version>${rocketmq-aliyun.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun.openservices</groupId>
+                <artifactId>ons-api</artifactId>
+                <version>${rocketmq-aliyun.version}</version>
             </dependency>
 
             <dependency>
@@ -559,6 +585,54 @@
                 <groupId>com.mysql</groupId>
                 <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector-java.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.boot</groupId>
+                <artifactId>pandora-hsf-spring-boot-starter</artifactId>
+                <version>${pandora.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.taobao.pandora</groupId>
+                <artifactId>taobao-hsf.sar</artifactId>
+                <version>${pandora.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.edas</groupId>
+                <artifactId>edas-sdk</artifactId>
+                <version>${edas-sdk.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.servlet</groupId>
+                        <artifactId>servlet-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.boot</groupId>
+                <artifactId>spring-boot-alibaba-context</artifactId>
+                <version>${pandora.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.middleware</groupId>
+                <artifactId>sdk</artifactId>
+                <version>${pandora.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.boot</groupId>
+                <artifactId>pandora-hsf-spring-boot-autoconfigure</artifactId>
+                <version>${pandora.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.boot</groupId>
+                <artifactId>pandora-hsf-spring-boot-autoconfigure2</artifactId>
+                <version>${pandora.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

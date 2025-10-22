@@ -29,12 +29,8 @@
             <artifactId>cloudapp-base-utils</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.opentelemetry</groupId>
-            <artifactId>opentelemetry-context</artifactId>
+            <groupId>com.alibaba.arms.apm</groupId>
+            <artifactId>arms-sdk</artifactId>
         </dependency>
     </dependencies>
 </project>

@@ -9,15 +9,12 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
+
     <name>cloudapp-spring-messaging-rocketmq</name>
     <artifactId>cloudapp-spring-messaging-rocketmq</artifactId>
     <version>${revision}</version>
 
     <dependencies>
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>alibabacloud-rocketmq20220801</artifactId>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.rocketmq</groupId>

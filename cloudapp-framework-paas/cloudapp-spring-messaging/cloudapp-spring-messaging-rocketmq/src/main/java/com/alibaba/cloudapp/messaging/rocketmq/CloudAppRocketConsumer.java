@@ -31,26 +31,40 @@ import com.alibaba.cloudapp.messaging.rocketmq.model.RocketDestination;
 import com.alibaba.cloudapp.messaging.rocketmq.model.RocketMQMessage;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketConsumerProperties;
 import com.alibaba.cloudapp.util.NetUtil;
-import org.apache.rocketmq.client.ClientConfig;
-import org.apache.rocketmq.client.consumer.DefaultLitePullConsumer;
-import org.apache.rocketmq.client.consumer.LitePullConsumer;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
+import org.apache.rocketmq.client.consumer.*;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.client.impl.CommunicationMode;
+import org.apache.rocketmq.client.impl.consumer.DefaultLitePullConsumerImpl;
+import org.apache.rocketmq.client.impl.consumer.DefaultMQPushConsumerImpl;
+import org.apache.rocketmq.client.impl.factory.MQClientInstance;
+import org.apache.rocketmq.client.trace.AsyncTraceDispatcher;
+import org.apache.rocketmq.client.trace.TraceDispatcher;
+import org.apache.rocketmq.client.trace.hook.ConsumeMessageTraceHookImpl;
+import org.apache.rocketmq.common.filter.ExpressionType;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.spring.annotation.SelectorType;
-import org.apache.rocketmq.spring.support.RocketMQUtil;
-import org.jetbrains.annotations.Nullable;
+import org.apache.rocketmq.common.message.MessageQueue;
+import org.apache.rocketmq.common.sysflag.PullSysFlag;
+import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.util.StringUtils;
 
+import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
-public class CloudAppRocketConsumer implements InitializingBean,
-        Consumer<LitePullConsumer, MessageExt> {
+public class CloudAppRocketConsumer implements
+        InitializingBean, Consumer<LitePullConsumer, MessageExt> {
     
     private static final int SINGLE = 1;
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
@@ -58,32 +72,34 @@ public class CloudAppRocketConsumer implements InitializingBean,
     private static final Logger logger = LoggerFactory.getLogger(
             CloudAppRocketConsumer.class);
     
-    private RocketConsumerProperties properties;
+    private RocketConsumerProperties consumerProperties;
     
     private TraceStorage traceStorage = new ThreadLocalTraceStorage();
+    private String namespace;
+    private SessionCredentials sessionCredentials;
+    private String nameServerAddr;
+    private TraceDispatcher traceDispatcher;
+    private final AtomicBoolean started = new AtomicBoolean(false);
     
-    private static final Map<RocketDestination, DefaultLitePullConsumer> CONSUMERS =
+    private static final Map<RocketDestination, Notifier<MessageExt>> CONSUMERS =
             Collections.synchronizedMap(new HashMap<>());
     
     /**
      * default consumer and subscribed all topic
      */
-    private DefaultLitePullConsumer defaultConsumer;
-    /**
-     * Configured destination
-     */
-    private RocketDestination defaultDestination;
-    
-    private boolean initialized = false;
-    
+    private DefaultLitePullConsumer pullConsumer;
+    private DefaultMQPushConsumer pushConsumer;
     
     public CloudAppRocketConsumer(RocketConsumerProperties properties) {
-        this.properties = properties;
+        this.namespace = properties.getNamespace();
+        this.consumerProperties = properties;
+        this.pushConsumer = createPushConsumer();
+        this.pullConsumer = createConsumer();
     }
     
     @Override
     public LitePullConsumer getDelegatingConsumer() {
-        return defaultConsumer;
+        return pullConsumer;
     }
     
     @Override
@@ -96,18 +112,16 @@ public class CloudAppRocketConsumer implements InitializingBean,
     public Collection<MQMessage<? extends MessageExt>> pull(
             Destination destination, int count
     ) throws CloudAppException {
-        
         return this.pull(destination, count, DEFAULT_TIMEOUT);
     }
     
     @Override
     public MessageExt pull(String topic) {
-        
         List<MessageExt> list = pollTopicMessages(
                 SINGLE, DEFAULT_TIMEOUT, createDestination(topic)
         );
         
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             logger.info("No message from topic: {}", topic);
             return null;
         }
@@ -118,8 +132,8 @@ public class CloudAppRocketConsumer implements InitializingBean,
     @Override
     public Collection<MessageExt> pull(String topic, int count) {
         
-        return pollTopicMessages(count, DEFAULT_TIMEOUT,
-                                 createDestination(topic)
+        return pollTopicMessages(
+                count, DEFAULT_TIMEOUT, createDestination(topic)
         );
     }
     
@@ -131,7 +145,7 @@ public class CloudAppRocketConsumer implements InitializingBean,
                 SINGLE, DEFAULT_TIMEOUT, destination
         );
         
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             logger.info("No message from topic: {}", destination.getTopic());
             return null;
         }
@@ -146,7 +160,7 @@ public class CloudAppRocketConsumer implements InitializingBean,
         
         List<MessageExt> list = pollTopicMessages(SINGLE, DEFAULT_TIMEOUT, rd);
         
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             logger.info("No message from topic: {}", topic);
             return null;
         }
@@ -161,9 +175,9 @@ public class CloudAppRocketConsumer implements InitializingBean,
     ) {
         List<MessageExt> list = pollTopicMessages(count, timeout, destination);
         
-        return list != null ? list.stream()
-                                  .map(e -> convertMessage(e, destination))
-                                  .collect(Collectors.toList()) : null;
+        return list.stream()
+           .map(e -> convertMessage(e, destination))
+           .collect(Collectors.toList());
     }
     
     
@@ -189,7 +203,7 @@ public class CloudAppRocketConsumer implements InitializingBean,
         message.setReceivedTimestamp(m.getStoreTimestamp());
         message.setDeliveredTimestamp(System.currentTimeMillis());
         message.setReceiver(createLocation(m.getBornHost()));
-        message.setSender(createLocation(m.getStoreHost()));
+        message.setSender(createLocation(new InetSocketAddress(8080)));
         
         return message;
     }
@@ -198,6 +212,9 @@ public class CloudAppRocketConsumer implements InitializingBean,
     public void subscribe(
             Destination destination, Notifier<MessageExt> notifier
     ) {
+        if (notifier == null) {
+            throw new CloudAppException("Notifier can not be null");
+        }
         if (destination == null || destination.getTopic() == null
                 || destination.getTopic().isEmpty()) {
             throw new CloudAppException("Topic can not be empty");
@@ -206,58 +223,16 @@ public class CloudAppRocketConsumer implements InitializingBean,
         RocketDestination rd = destination instanceof RocketDestination ?
                 (RocketDestination) destination :
                 new RocketDestination(destination.getTopic());
-        
-        boolean contains = CONSUMERS.keySet().stream().anyMatch(d -> d.isContains(rd));
-        
-        if (!CONSUMERS.containsKey(rd)) {
-            String name = "Pull" + System.currentTimeMillis()
-                    + new Random().nextInt(10000);
-            DefaultLitePullConsumer consumer = createConsumer(
-                    rd, properties.getPullBatchSize(), name
-            );
-            this.start(consumer);
-            
-            CONSUMERS.put(rd, consumer);
-            
-            if (initialized) {
-                reSubscribe();
+        try {
+            if (!isSubscribed(rd)) {
+               pushConsumer.subscribe(rd.getTopic(), rd.getTagsString());
+               CONSUMERS.put(rd, notifier);
             } else {
-                try {
-                    defaultConsumer.subscribe(rd.getTopic(), rd.getTagsString());
-                } catch (MQClientException e) {
-                    throw new CloudAppException("subscribe topic error", e);
-                }
+                throw new CloudAppException(
+                        "Subscribing to topic '" + rd.getTopic() + "' multiple times");
             }
-        }
-        
-        if (notifier != null) {
-            MessageExt message = new MessageExt();
-            message.setBody(Base64.getEncoder().encode("subscribe".getBytes()));
-            MQMessage<MessageExt> mq = convertMessage(message, rd);
-            notifier.onMessageNotified(mq);
-        }
-    }
-    
-    private void reSubscribe() {
-        synchronized (this) {
-            defaultConsumer.shutdown();
-            defaultConsumer = createConsumer(
-                    defaultDestination,
-                    properties.getPullBatchSize(),
-                    properties.getName()
-            );
-            
-            CONSUMERS.keySet().stream().filter(
-                    d -> !d.equals(defaultDestination)
-            ).forEach(d -> {
-                try {
-                    defaultConsumer.subscribe(d.getTopic(), d.getTagsString());
-                } catch (MQClientException e) {
-                    throw new CloudAppException(
-                            "subscribe topic error", e);
-                }
-            });
-            this.start(defaultConsumer);
+        } catch (Exception e) {
+            throw new CloudAppException("subscribe failed", e);
         }
     }
     
@@ -278,6 +253,20 @@ public class CloudAppRocketConsumer implements InitializingBean,
         this.unsubscribe(topic, null);
     }
     
+    private boolean isSubscribed(RocketDestination destination) {
+        return CONSUMERS.keySet().stream().anyMatch(
+                d -> d.isContains(destination)
+        );
+    }
+    
+    private boolean isSubscribed(String topic, String tags) {
+        RocketDestination destination = new RocketDestination(topic);
+        destination.addTag(tags);
+        return CONSUMERS.keySet().stream().anyMatch(
+                d -> d.isContains(destination)
+        );
+    }
+    
     @Override
     public void unsubscribe(
             Destination destination, Notifier<MessageExt> notifier
@@ -290,37 +279,23 @@ public class CloudAppRocketConsumer implements InitializingBean,
         RocketDestination rd = destination instanceof RocketDestination ?
                 (RocketDestination) destination :
                 new RocketDestination(destination.getTopic());
-        
-        if(rd.equals(defaultDestination)) {
-            throw new CloudAppException("Default destination can not be unsubscribed");
+        if (!CONSUMERS.containsKey(rd)) {
+            throw new CloudAppException(
+                    "Unsubscribing from topic '" + rd.getTopic());
         }
-        
-        DefaultLitePullConsumer consumer = this.getPullConsumer(rd);
-        if(initialized) {
-            synchronized (this) {
-                consumer.shutdown();
-                CONSUMERS.remove(rd);
-                
-                reSubscribe();
-            }
-        } else {
-            defaultConsumer.unsubscribe(rd.getTopic());
-            CONSUMERS.keySet().forEach(d -> {
-                try {
-                    defaultConsumer.subscribe(d.getTopic(), d.getTagsString());
-                } catch (MQClientException e) {
-                    throw new CloudAppException("subscribe topic error", e);
-                }
-            });
-        }
+        CONSUMERS.remove(rd);
         
         if (notifier != null) {
             MessageExt message = new MessageExt();
-            message.setBody(Base64.getEncoder().encode("unsubscribe".getBytes()));
-            MQMessage<MessageExt> mq = convertMessage(message, rd);
-            notifier.onMessageNotified(mq);
+            message.setMsgId(UUID.randomUUID().toString());
+            message.setTopic(rd.getTopic());
+            message.setBody("unsubscribed".getBytes());
+            message.setTags(rd.getTagsString());
+            message.setKeys("");
+            message.setBornHost(new InetSocketAddress(8080));
+            message.setStoreHost(new InetSocketAddress(8080));
+            notifier.onMessageNotified(convertMessage(message, rd));
         }
-        
     }
     
     @Override
@@ -330,53 +305,79 @@ public class CloudAppRocketConsumer implements InitializingBean,
         RocketDestination rd = createDestination(topic);
         
         this.unsubscribe(rd, notifier);
-        
     }
     
     @Override
     public void close() {
-        defaultConsumer.shutdown();
+        pullConsumer.shutdown();
     }
     
-    public void start(DefaultLitePullConsumer consumer) {
+    private DefaultLitePullConsumer createConsumer() {
         try {
-            consumer.start();
-        } catch (MQClientException e) {
-            throw new CloudAppException("Error to start consumer", e);
+            String name = "pull" + consumerProperties.getName()
+                    + new Random().nextInt(10000);
+            DefaultLitePullConsumer consumer = new DefaultLitePullConsumer(
+                    consumerProperties.getGroup(),
+                    new AclClientRPCHook(sessionCredentials)
+            );
+            consumer.setNamespaceV2(namespace);
+            consumer.setNamesrvAddr(nameServerAddr);
+            consumer.setConsumerGroup(consumerProperties.getGroup());
+            consumer.setInstanceName(name);
+            consumer.setVipChannelEnabled(consumerProperties.isVipChannelEnable());
+            consumer.setConsumerTimeoutMillisWhenSuspend(consumerProperties.getSuspendTimeMillis());
+            consumer.setConsumerPullTimeoutMillis(consumerProperties.getMaxTimeout());
+            return consumer;
+        } catch (Exception e) {
+            throw new CloudAppException("try create consumer failed.", e);
         }
     }
     
-    private DefaultLitePullConsumer createConsumer(
-            RocketDestination destination, int size, String name
-    ) {
+    private DefaultMQPushConsumer createPushConsumer() {
         try {
-            DefaultLitePullConsumer litePullConsumer = RocketMQUtil
-                    .createDefaultLitePullConsumer(
-                            properties.getNameServer(),
-                            properties.getAccessChannel(),
-                            properties.getGroup(),
-                            destination.getTopic(),
-                            properties.getMessageModel(),
-                            SelectorType.TAG,
-                            destination.getTagsString(),
-                            properties.getUsername(),
-                            properties.getPassword(),
-                            size,
-                            properties.isUseTLS()
-                    );
-            litePullConsumer.setEnableMsgTrace(properties.isEnableMsgTrace());
+            String name = "push" + consumerProperties.getName()
+                    + new Random().nextInt(10000);
             
-            litePullConsumer.setCustomizedTraceTopic(
-                    properties.getTraceTopic());
+            DefaultMQPushConsumer consumer = new DefaultMQPushConsumer(
+                    consumerProperties.getGroup(),
+                    new AclClientRPCHook(sessionCredentials)
+            );
             
-            if (StringUtils.hasText(properties.getNamespace())) {
-                litePullConsumer.setNamespace(properties.getNamespace());
+            if (consumerProperties.getPullBatchSize() > 0) {
+                consumer.setPullBatchSize(consumerProperties.getPullBatchSize());
+            }
+            if (consumerProperties.getMaxTimeout() > 0) {
+                try {
+                    consumer.setConsumeTimeout(consumerProperties.getMaxTimeout());
+                } catch (NumberFormatException ignored) {
+                }
             }
             
-            litePullConsumer.setInstanceName(name);
+            consumer.setNamespaceV2(namespace);
+            consumer.setInstanceName(name);
+            consumer.setNamesrvAddr(this.nameServerAddr);
+            consumer.setVipChannelEnabled(consumerProperties.isVipChannelEnable());
+            boolean msgTraceSwitch = consumerProperties.getEnableMsgTrace();
+            if(msgTraceSwitch) {
+                AsyncTraceDispatcher dispatcher = new AsyncTraceDispatcher(
+                        consumerProperties.getGroup(),
+                        TraceDispatcher.Type.CONSUME,
+                        consumerProperties.getTraceTopic(),
+                        null
+                );
+                dispatcher.getTraceProducer().setUseTLS(consumerProperties.isUseTLS());
+                this.traceDispatcher = dispatcher;
+                consumer.getDefaultMQPushConsumerImpl()
+                        .registerConsumeMessageHook(
+                                new ConsumeMessageTraceHookImpl(traceDispatcher)
+                        );
+            }
             
-            return litePullConsumer;
-        } catch (MQClientException e) {
+            consumer.setPostSubscriptionWhenPull(false);
+            MessageModel messageModel = consumerProperties.getMessageModel();
+            consumer.setMessageModel(messageModel);
+            return consumer;
+        } catch (Exception e) {
             throw new CloudAppException("try create consumer failed.", e);
         }
     }
@@ -384,34 +385,68 @@ public class CloudAppRocketConsumer implements InitializingBean,
     private List<MessageExt> pollTopicMessages(
             int count, Duration timeout, Destination destination
     ) {
-        List<MessageExt> list;
         
-        RocketDestination rd = null;
-        
-        if (destination instanceof RocketDestination) {
-            rd = (RocketDestination) destination;
-        } else if (destination != null) {
-            new RocketDestination(destination.getTopic());
-        }
-        
-        DefaultLitePullConsumer lpc = this.getPullConsumer(rd);
-        int defaultCount = properties.getPullBatchSize();
-        
-        synchronized (this) {
-            if(defaultCount != count) {
-                lpc.setPullBatchSize(count);
+        String topic = destination.getTopic();
+        String tag = destination instanceof RocketDestination ?
+                ((RocketDestination) destination).getTagsString() : null;
+        try {
+            Collection<MessageQueue> set = pullConsumer.fetchMessageQueues(topic);
+            List<MessageExt> list =
+                    Collections.synchronizedList(new ArrayList<>(count));
+            if(set.isEmpty()) {
+                return list;
             }
-            long timeoutMillis = timeout == null ?
-                    lpc.getPollTimeoutMillis() : timeout.toMillis();
-            
-            list = lpc.poll(timeoutMillis);
-            
-            if(defaultCount != count) {
-                lpc.setPullBatchSize(defaultCount);
+            int pullCount = 0;
+            for (MessageQueue queue : set) {
+                try {
+                    DefaultLitePullConsumerImpl impl = getDefaultLitePullConsumerImpl();
+                    long offset = impl.searchOffset(queue, 0L);
+                    int sysFlag = PullSysFlag.buildSysFlag(
+                            false, true, true,
+                            false, true);
+                    
+                    PullResult pullResult = impl
+                            .getPullAPIWrapper()
+                            .pullKernelImpl(
+                                    queue,
+                                    tag,
+                                    ExpressionType.TAG,
+                                    0L,
+                                    offset,
+                                    count,
+                                    sysFlag,
+                                    0,
+                                    pullConsumer.getBrokerSuspendMaxTimeMillis(),
+                                    timeout.toMillis(),
+                                    CommunicationMode.SYNC,
+                                    null
+                    );
+                    impl.updateConsumeOffset(queue, pullResult.getNextBeginOffset());
+                    pullConsumer.getOffsetStore().updateConsumeOffsetToBroker(
+                            queue, pullResult.getNextBeginOffset(), false);
+                    if (pullResult.getPullStatus().equals(PullStatus.FOUND)) {
+                        list.addAll(pullResult.getMsgFoundList());
+                        pullCount = pullResult.getMsgFoundList().size();
+                    }
+                    count = count - pullCount;
+                    if (pullCount >= count) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    throw new CloudAppException("pull message error", e);
+                }
             }
+            return list;
+        } catch (Exception e) {
+            throw new CloudAppException("pull message error", e);
         }
-        
-        return list;
+    }
+    
+    private DefaultLitePullConsumerImpl getDefaultLitePullConsumerImpl() throws Exception{
+        Field f = DefaultLitePullConsumer.class
+                .getDeclaredField("defaultLitePullConsumerImpl");
+        f.setAccessible(true);
+        return (DefaultLitePullConsumerImpl) f.get(pullConsumer);
     }
     
     /**
@@ -432,22 +467,8 @@ public class CloudAppRocketConsumer implements InitializingBean,
     
     @Override
     public void afterPropertiesSet() {
-        defaultDestination = new RocketDestination(
-                properties.getTopic(),
-                properties.getTags()
-        );
-        
-        this.defaultConsumer = createConsumer(
-                defaultDestination, properties.getPullBatchSize(), properties.getName()
-        );
-        
-        CONSUMERS.put(defaultDestination, defaultConsumer);
-        
-        this.start(defaultConsumer);
-        initialized = true;
     }
     
-    @Nullable
     private static RocketDestination createDestination(String topic) {
         RocketDestination rd = null;
         if (StringUtils.hasText(topic)) {
@@ -472,49 +493,127 @@ public class CloudAppRocketConsumer implements InitializingBean,
         return location;
     }
     
-    private DefaultLitePullConsumer getPullConsumer(
-            RocketDestination destination
-    ) {
-        ClientConfig clientConfig = CONSUMERS.get(destination);
-        
-        if(clientConfig == null) {
-            String message = "Topic " + destination.getTopic()
-                    + ":" + destination.getTagsString()
-                    + " not be subscribed";
-            throw new CloudAppException(message);
+    public void refresh(RocketConsumerProperties input) {
+        logger.info("refresh rocketmq consumer properties.");
+        this.consumerProperties = input;
+//        this.properties.putAll(ONSUtil.extractProperties(input.toProperties()));
+        boolean isStarted = this.isStarted();
+        this.shutdown();
+
+        this.nameServerAddr = input.getNameServer();
+        this.namespace = input.getNamespace();
+
+        this.sessionCredentials = new SessionCredentials(
+                input.getUsername(), input.getPassword()
+        );
+
+        this.pullConsumer = createConsumer();
+        this.pushConsumer = createPushConsumer();
+        this.traceDispatcher = null;
+
+        for(RocketDestination rd : CONSUMERS.keySet()) {
+            try {
+                pushConsumer.subscribe(rd.getTopic(), rd.getTagsString());
+            } catch (MQClientException e) {
+                throw new RuntimeException(e);
+            }
         }
-        return defaultConsumer;
+
+        if(isStarted) {
+            this.start();
+        }
     }
     
-    public void refresh(RocketConsumerProperties input) {
-        this.properties = input;
-        initialized = true;
-        
-        CONSUMERS.forEach((k,v) -> v.shutdown());
-        CONSUMERS.clear();
-        
-        defaultDestination = new RocketDestination(
-                properties.getTopic(),
-                properties.getTags()
-        );
-        
-        this.defaultConsumer = createConsumer(
-                defaultDestination, properties.getPullBatchSize(), properties.getName()
-        );
-        
-        
-        CONSUMERS.put(defaultDestination, defaultConsumer);
-        
-        this.start(defaultConsumer);
-        
+    public void start() {
+        logger.info("Starting RocketMQ consumer");
+        if (started.compareAndSet(false, true)) {
+            try {
+                this.pullConsumer.start();
+                this.pushConsumer.registerMessageListener(new PushMessageListener());
+                this.pushConsumer.start();
+            } catch (MQClientException e) {
+                throw new RuntimeException(e);
+            }
+            this.started.set(true);
+        }
+    }
+    
+    public void shutdown() {
+        if (started.compareAndSet(true, false)) {
+            try {
+                this.pullConsumer.shutdown();
+                this.pushConsumer.shutdown();
+            } catch (Exception e) {
+                logger.error("shutdown consumer error", e);
+            }
+        }
+    }
+    
+    protected void updateNameServerAddr(String newAddrs) {
+        logger.info("update name server addr: {}", newAddrs);
+        this.nameServerAddr = newAddrs;
+        pushConsumer.setNamesrvAddr(newAddrs);
+        pullConsumer.setNamesrvAddr(newAddrs);
         try {
-            this.defaultConsumer.subscribe(defaultDestination.getTopic(),
-                                           defaultDestination.getTagsString());
-        } catch (MQClientException e) {
+            Field field = DefaultLitePullConsumer.class
+                    .getDeclaredField("defaultLitePullConsumerImpl");
+            field.setAccessible(true);
+            DefaultLitePullConsumerImpl impl = (DefaultLitePullConsumerImpl) field.get(pullConsumer);
+            field = DefaultLitePullConsumerImpl.class
+                    .getDeclaredField("mQClientFactory");
+            field.setAccessible(true);
+            
+            MQClientInstance instance = (MQClientInstance) field.get(impl);
+            instance.getMQClientAPIImpl().updateNameServerAddressList(newAddrs);
+            
+            field = DefaultMQPushConsumer.class.getDeclaredField(
+                    "defaultMQPushConsumerImpl");
+            field.setAccessible(true);
+            DefaultMQPushConsumerImpl pushImpl = (DefaultMQPushConsumerImpl) field.get(pushConsumer);
+            
+            pushImpl.getmQClientFactory().getMQClientAPIImpl().updateNameServerAddressList(newAddrs);
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        
-        initialized = true;
     }
     
+    class PushMessageListener implements MessageListenerConcurrently {
+        @Override
+        public ConsumeConcurrentlyStatus consumeMessage(
+                List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
+            if (msgs == null) {
+                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            }
+            for (MessageExt msg : msgs) {
+                RocketDestination destination = createDestination(msg.getTopic());
+                destination.addTag(msg.getTags());
+                RocketDestination rd = CONSUMERS.keySet().stream().filter(
+                        d -> d.isContains(destination)
+                ).findFirst().orElse(null);
+                if (rd == null) {
+                    logger.error("can not find destination for message: {}", msg);
+                    throw new CloudAppException("can not find destination for message: " + msg);
+                }
+                Notifier<MessageExt> notifier = CONSUMERS.get(rd);
+                notifier.onMessageNotified(convertMessage(msg, rd));
+            }
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+        }
+    }
+    
+    public String getNameServerAddr() {
+        return nameServerAddr;
+    }
+    
+    public void setNameServerAddr(String nameServerAddr) {
+        this.nameServerAddr = nameServerAddr;
+    }
+    
+    public boolean isStarted() {
+        return started.get();
+    }
+    
+    public void setStarted(boolean started) {
+        this.started.set(started);
+    }
 }

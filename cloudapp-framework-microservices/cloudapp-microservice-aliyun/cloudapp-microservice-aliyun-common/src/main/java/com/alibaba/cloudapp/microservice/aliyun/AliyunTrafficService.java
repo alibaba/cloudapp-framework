@@ -22,9 +22,6 @@ package com.alibaba.cloudapp.microservice.aliyun;
 import com.alibaba.cloud.nacos.registry.NacosRegistration;
 import com.alibaba.cloudapp.api.microservice.TrafficService;
 import com.alibaba.cloudapp.util.FileUtils;
-import io.opentelemetry.api.baggage.Baggage;
-import io.opentelemetry.api.baggage.BaggageBuilder;
-import io.opentelemetry.context.Scope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
@@ -103,12 +100,12 @@ public class AliyunTrafficService implements TrafficService,
     
     @Override
     public String getCurrentTrafficLabel() {
-        // first get canary tag, then get swim lane tag
-        String tag = OpenTelemetryTagTool.originalTrafficTag(
-                OpenTelemetryTagTool.LANE_TAG);
+        // first get lane tag, then get canary tag
+        String tag = ArmsTagTool.originalTrafficTag(
+                ArmsTagTool.LANE_TAG);
         if (!StringUtils.hasText(tag)) {
-            tag = OpenTelemetryTagTool.originalTrafficTag(
-                    OpenTelemetryTagTool.CANARY_TAG);
+            tag = ArmsTagTool.originalTrafficTag(
+                    ArmsTagTool.CANARY_TAG);
         }
         return tag;
     }
@@ -199,27 +196,26 @@ public class AliyunTrafficService implements TrafficService,
     }
     
     @Override
-    public Scope withTrafficLabel(String labelValue) {
+    public void withTrafficLabel(String labelValue) {
         if (StringUtils.isEmpty(labelValue)) {
             logger.warn(
                     "The label value transferred from upstream is empty, which " +
                             "will lead to the traffic label erased," +
                             " please confirm is the desired behavior ?");
-            return OpenTelemetryTagTool.buildBaggageScope(
-                    Baggage.current().toBuilder());
+            ArmsTagTool.clearCanaryTag();
+            return;
         }
-        BaggageBuilder builder = OpenTelemetryTagTool.withCanaryTag(labelValue);
-        return OpenTelemetryTagTool.buildBaggageScope(builder);
+        ArmsTagTool.withCanaryTag(labelValue);
     }
     
     @Override
     public Map<String, String> getBaggageUserData() {
-        return OpenTelemetryTagTool.baggageItems();
+        return ArmsTagTool.baggageItems();
     }
     
     @Override
     public String getBaggageUserDataValue(String key) {
-        Map<String, String> baggageItems = OpenTelemetryTagTool.baggageItems();
+        Map<String, String> baggageItems = ArmsTagTool.baggageItems();
         
         if (baggageItems.containsKey(key)) {
             return baggageItems.get(key);
@@ -235,14 +231,13 @@ public class AliyunTrafficService implements TrafficService,
     }
     
     @Override
-    public Scope withBaggageUserData(Map<String, String> pairs) {
-        BaggageBuilder builder = OpenTelemetryTagTool.putBaggageItems(pairs);
-        return OpenTelemetryTagTool.buildBaggageScope(builder);
+    public void withBaggageUserData(Map<String, String> pairs) {
+        ArmsTagTool.putBaggageItems(pairs);
     }
     
     @Override
     public String currentTraceId() {
-        return OpenTelemetryTagTool.getTraceId();
+        return ArmsTagTool.getTraceId();
     }
     
     @Override

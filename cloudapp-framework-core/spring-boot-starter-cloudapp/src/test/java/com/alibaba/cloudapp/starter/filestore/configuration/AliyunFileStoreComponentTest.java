@@ -49,7 +49,7 @@ class AliyunFileStoreComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.filestore.aliyun",
+        assertEquals("io.cloudapp.filestore.aliyun",
                      storeComponent.bindKey()
         );
     }

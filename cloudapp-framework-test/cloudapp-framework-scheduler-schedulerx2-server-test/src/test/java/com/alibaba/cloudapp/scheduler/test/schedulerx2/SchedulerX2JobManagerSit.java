@@ -21,6 +21,8 @@ package com.alibaba.cloudapp.scheduler.test.schedulerx2;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.aliyun.schedulerx220190430.Client;
+import com.aliyun.schedulerx220190430.models.ListGroupsRequest;
+import com.aliyun.schedulerx220190430.models.ListGroupsResponse;
 import com.aliyun.schedulerx220190430.models.ListJobsRequest;
 import com.aliyun.schedulerx220190430.models.ListJobsResponse;
 import com.alibaba.cloudapp.api.scheduler.model.ExecuteMode;
@@ -93,7 +95,7 @@ public class SchedulerX2JobManagerSit {
     @Test
     public void list() {
 /*
-//        nested exception is com.alibaba.cloudapp.exeption.CloudAppException: java.lang.NullPointerException
+//        nested exception is io.cloudapp.exeption.CloudAppException: java.lang.NullPointerException
      List list = jobManager.list(namespace, groupId, "", "");
      List list = jobManager.list(namespace, groupId, jobName, "");
 */
@@ -113,7 +115,7 @@ public class SchedulerX2JobManagerSit {
 
 //        job type, required
 //        job.setJobType(JobType.JAVA);
-//        job.setClassName("com.alibaba.cloudapp.scheduler.test.schedulerx2.JobTest");
+//        job.setClassName("io.cloudapp.scheduler.test.schedulerx2.JobTest");
 
 //        job.setJobType(JobType.SHELL);
 //        job.setContent("echo 'shell test..'");

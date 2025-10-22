@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: apigateway-aliyun-demo
+  main:
+    allow-bean-definition-overriding: true
+
+io:
+  cloudapp:
+    apigateway:
+      aliyun:
+        enabled: true
+        oAuth2:
+          client-id: ${clientId}
+          client-secret: ${clientSecret}
+          redirect-uri: http://localhost:8080/oauth/code
+          scopes:
+            - openid
+            - profile
+          grant-types:
+            - authorization_code
+            - refresh_token
+          authorization-uri: https://gitlab.com/oauth/authorize
+          token-uri: https://gitlab.com/oauth/token
+          jwks-url: https://gitlab.com/oauth/discovery/keys
+          filter-skip-urls:
+            - /manager/**
+            - /proxy/**

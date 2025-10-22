@@ -25,21 +25,26 @@ import com.alibaba.cloudapp.api.messaging.model.MQMessage;
 import com.alibaba.cloudapp.exeption.CloudAppException;
 import com.alibaba.cloudapp.messaging.rocketmq.model.RocketDestination;
 import com.alibaba.cloudapp.messaging.rocketmq.properties.RocketProducerProperties;
+import org.apache.rocketmq.acl.common.AclClientRPCHook;
+import org.apache.rocketmq.acl.common.SessionCredentials;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.client.producer.SendCallback;
 import org.apache.rocketmq.client.producer.SendResult;
+import org.apache.rocketmq.client.trace.AsyncTraceDispatcher;
+import org.apache.rocketmq.client.trace.TraceDispatcher;
+import org.apache.rocketmq.client.trace.hook.SendMessageTraceHookImpl;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.common.message.MessageExt;
-import org.apache.rocketmq.spring.support.RocketMQUtil;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CloudAppRocketProducer implements
         Producer<MQProducer, MessageExt>, InitializingBean {
@@ -49,7 +54,13 @@ public class CloudAppRocketProducer implements
     
     private RocketProducerProperties properties;
     
-    DefaultMQProducer producer;
+    private DefaultMQProducer producer;
+    
+    private final AtomicBoolean started = new AtomicBoolean(false);
+    private String nameServerAddr;
+    private SessionCredentials sessionCredentials;
+    private String namespace;
+    private TraceDispatcher traceDispatcher;
     
     public CloudAppRocketProducer(RocketProducerProperties properties) {
         this.properties = properties;
@@ -136,7 +147,8 @@ public class CloudAppRocketProducer implements
     }
     
     @Override
-    public CompletableFuture<SendResult> sendAsync(MQMessage<? extends MessageExt> message)
+    public CompletableFuture<SendResult> sendAsync(MQMessage<?
+            extends MessageExt> message)
             throws CloudAppException {
         return sendAsync(message.getDestination(), message.getMessageBody());
     }
@@ -205,7 +217,6 @@ public class CloudAppRocketProducer implements
         return getSendFutureResult(destination, msg);
     }
     
-    @NotNull
     private CompletableFuture<SendResult> getSendFutureResult(Destination destination,
                                                               Message msg) {
         CompletableFuture<SendResult> future = new CompletableFuture<>();
@@ -240,52 +251,93 @@ public class CloudAppRocketProducer implements
         producer.shutdown();
     }
     
+    public void start() {
+        if (this.started.compareAndSet(false, true)) {
+            try {
+                producer.start();
+            } catch (MQClientException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+    
+    public void shutdown() {
+        if (this.started.compareAndSet(true, false)) {
+            producer.shutdown();
+        }
+    }
+    
     public DefaultMQProducer createProducer() {
-        
-        DefaultMQProducer producer = RocketMQUtil.createDefaultMQProducer(
+        DefaultMQProducer producer = new DefaultMQProducer(
                 properties.getGroup(),
-                properties.getUsername(),
-                properties.getPassword(),
-                properties.isEnableMsgTrace(),
-                properties.getTraceTopic()
+                new AclClientRPCHook(sessionCredentials)
         );
         
-        producer.setNamesrvAddr(properties.getNameServer());
-        producer.setSendMsgTimeout(properties.getSendTimeout());
-        producer.setRetryTimesWhenSendFailed(
-                properties.getRetryTimesWhenSendFailed());
-        producer.setRetryTimesWhenSendAsyncFailed(
-                properties.getRetryTimesWhenSendAsyncFailed());
-        producer.setMaxMessageSize(properties.getMaxMessageSize());
-        producer.setCompressMsgBodyOverHowmuch(
-                properties.getCompressMsgBodyOverHowMuch());
-        producer.setRetryAnotherBrokerWhenNotStoreOK(
-                properties.getRetryNextServer());
-        producer.setUseTLS(properties.isUseTLS());
-        producer.setNamespace(properties.getNamespace());
+        producer.setNamespaceV2(properties.getNamespace());
+        producer.setProducerGroup(properties.getGroup());
+        producer.setSendMsgTimeout(properties.getSendTimeout() * 1000);
         
-        producer.setInstanceName(properties.getName());
-        
+        String instanceName = StringUtils.hasText(properties.getName()) ?
+                properties.getName() : this.buildInstanceName();
+        producer.setInstanceName(instanceName);
+        producer.setNamesrvAddr(nameServerAddr);
+        producer.setMaxMessageSize(1024 * 1024 * 4);
+        producer.setVipChannelEnabled(false);
+        if (!properties.isEnableMsgTrace()) {
+            logger.info("MQ Client Disable the Trace Hook!");
+        } else {
+            AsyncTraceDispatcher dispatcher = new AsyncTraceDispatcher(
+                    properties.getGroup(),
+                    TraceDispatcher.Type.CONSUME,
+                    properties.getTraceTopic(),
+                    null
+            );
+            dispatcher.getTraceProducer().setUseTLS(properties.isUseTLS());
+            this.traceDispatcher = dispatcher;
+            producer.getDefaultMQProducerImpl()
+                    .registerSendMessageHook(
+                            new SendMessageTraceHookImpl(traceDispatcher)
+                    );
+        }
         return producer;
     }
     
     @Override
     public void afterPropertiesSet() throws Exception {
         logger.info("Starting RocketMQ producer");
-        producer.start();
     }
     
-    public void refresh(RocketProducerProperties properties)
-            throws MQClientException {
+    public void refresh(RocketProducerProperties properties) {
         synchronized (this) {
-            producer.shutdown();
+            boolean isStarted = this.isStarted();
+            
+            if (isStarted) {
+                this.shutdown();
+            }
             
             this.properties = properties;
             producer = createProducer();
-            
-            producer.start();
+            this.traceDispatcher = null;
+            if  (isStarted) {
+                this.start();
+            }
         }
-        
     }
     
+    protected void updateNameServerAddr(String newAddrs) {
+        logger.info("updateNameServerAddr {}", newAddrs);
+    }
+    
+    public boolean isStarted() {
+        return started.get();
+    }
+    
+    public void setStarted(boolean started) {
+        this.started.set(started);
+    }
+    
+    private String buildInstanceName() {
+        long timestamp = System.nanoTime();
+        return Long.toHexString(timestamp);
+    }
 }

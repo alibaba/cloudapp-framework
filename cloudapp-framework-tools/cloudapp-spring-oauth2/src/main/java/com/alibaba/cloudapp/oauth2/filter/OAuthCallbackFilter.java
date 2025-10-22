@@ -45,7 +45,7 @@ public class OAuthCallbackFilter implements Filter, Ordered {
     private final AuthorizationService oauthService;
     private final TokenStorageService tokenStore;
     private LoginHandler loginHandler;
-    private static final String DEFAULT_SUCCESS_URL = "/";
+    public static final String DEFAULT_SUCCESS_URL = "/";
     
     private static final Long DEFAULT_EXPIRES_IN = LocalDateTime.MAX
             .toEpochSecond(ZoneOffset.UTC);
@@ -78,7 +78,7 @@ public class OAuthCallbackFilter implements Filter, Ordered {
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         
-        if (!oauthService.isRedirectUrl(request.getRequestURI())
+        if (oauthService == null || !oauthService.isRedirectUrl(request.getRequestURI())
                 || request.getMethod().equals(HttpMethod.OPTIONS.name())) {
             chain.doFilter(servletRequest, servletResponse);
             return;

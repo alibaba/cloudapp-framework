@@ -16,8 +16,10 @@
     <packaging>pom</packaging>
     <name>cloudapp-base-demo</name>
     <description>cloudapp-base-demo</description>
+
     <modules>
         <module>cloudapp-threadpool-demo</module>
+        <module>cloudapp-base-utils-demo</module>
     </modules>
 
     <dependencyManagement>

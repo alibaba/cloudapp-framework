@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: apigateway-aliyun-demo
+  main:
+    allow-bean-definition-overriding: true
+
+io:
+  cloudapp:
+    apigateway:
+      aliyun:
+        enabled: true
+        brokerUrl: ${brokerUrl}
+
+apiKey:
+  apiKey: acd5c2e14b8f6d83d00
+  headerName: x-csb-apikey

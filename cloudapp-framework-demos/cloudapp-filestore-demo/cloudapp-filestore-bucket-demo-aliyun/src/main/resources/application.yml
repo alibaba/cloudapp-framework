@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: oss-bucket-demo
+
+io:
+  cloudapp:
+    filestore:
+      aliyun:
+        enabled: true
+        access-key: ${ACCESS_KEY}
+        secret-key: ${SECRET_KEY}
+        endpoint: http://oss-cn-wulan-env149-d01-a.inter.env149.shuguang.com
+
+server:
+  port: 8080

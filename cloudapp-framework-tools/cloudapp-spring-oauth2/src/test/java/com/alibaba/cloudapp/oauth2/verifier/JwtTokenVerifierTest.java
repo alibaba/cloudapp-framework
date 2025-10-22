@@ -19,6 +19,7 @@
 
 package com.alibaba.cloudapp.oauth2.verifier;
 
+import com.alibaba.cloudapp.exeption.CloudAppException;
 import org.junit.Before;
 import org.junit.Test;
 

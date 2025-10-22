@@ -48,7 +48,7 @@ class SnowflakeSequenceRefreshComponentTest {
     
     @Test
     void testBindKey() {
-        assertEquals("com.alibaba.cloudapp.sequence.snowflake",
+        assertEquals("io.cloudapp.sequence.snowflake",
                      component.bindKey()
         );
     }

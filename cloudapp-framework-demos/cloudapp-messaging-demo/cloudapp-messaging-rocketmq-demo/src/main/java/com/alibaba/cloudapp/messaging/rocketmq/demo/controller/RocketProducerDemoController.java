@@ -19,18 +19,14 @@
 
 package com.alibaba.cloudapp.messaging.rocketmq.demo.controller;
 
-import com.alibaba.cloudapp.exeption.CloudAppException;
 import com.alibaba.cloudapp.messaging.rocketmq.CloudAppRocketProducer;
-import org.apache.rocketmq.client.producer.SendResult;
-import org.apache.rocketmq.spring.core.RocketMQTemplate;
+import com.alibaba.cloudapp.messaging.rocketmq.demo.service.RocketDemoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.concurrent.CompletableFuture;
 
 @RestController
 public class RocketProducerDemoController {
@@ -42,35 +38,17 @@ public class RocketProducerDemoController {
     @Autowired
     @Qualifier("rocketProducer")
     CloudAppRocketProducer rocketProducer;
-
-    RocketMQTemplate rocketMQTemplate;
+    @Autowired
+    RocketDemoService service;
 
     @RequestMapping("/testRocketProducer")
     public void testRocketProducer() {
-        try {
-            rocketProducer.send("test-topic", "hello world!");
-            logger.info("send message success!");
-        } catch (CloudAppException e) {
-            logger.error("send message failed!", e);
-        }
+        service.sendData();
     }
     
     @RequestMapping("/testAsync")
-    public void testAsync() {
-        try {
-            CompletableFuture<SendResult> future = rocketProducer.sendAsync(
-                    "test-topic", "hello world!");
-            
-            future.whenComplete((result, throwable) -> {
-                if(throwable != null) {
-                    logger.error("send message failed!", throwable);
-                    return;
-                }
-                logger.info("send message success!");
-            });
-        } catch (CloudAppException e) {
-            logger.error("send message failed!", e);
-        }
+    public Object[] testAsync() {
+       return service.sendAsync();
     }
 
 

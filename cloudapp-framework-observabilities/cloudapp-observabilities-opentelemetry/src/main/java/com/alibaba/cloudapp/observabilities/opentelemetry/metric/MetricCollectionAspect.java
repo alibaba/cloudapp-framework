@@ -393,7 +393,7 @@ public class MetricCollectionAspect {
      * The JointPoint of the MetricCollection. It will initialize the fields
      * and the methods of the target class.
      */
-    @Around("@within(com.alibaba.cloudapp.api.observabilities.MetricCollection)")
+    @Around("@within(io.cloudapp.api.observabilities.MetricCollection)")
     public Object aop(ProceedingJoinPoint pjp) throws Throwable {
         String className = getPointClass(pjp).getName();
         if (!initializedClassesCache.containsKey(className)) {
@@ -406,7 +406,7 @@ public class MetricCollectionAspect {
      * Handle the field of the MetricCollection when setter method is invoked.
      * Trigger the related metric to record value.
      */
-    @Around("@within(com.alibaba.cloudapp.api.observabilities.MetricCollection) && " +
+    @Around("@within(io.cloudapp.api.observabilities.MetricCollection) && " +
             "execution(* set*(..))")
     public Object filedHandler(ProceedingJoinPoint pjp) throws Throwable {
         String methodName = pjp.getSignature().getName();
@@ -493,7 +493,7 @@ public class MetricCollectionAspect {
      * @return
      * @throws Throwable
      */
-    @Around("@annotation(com.alibaba.cloudapp.api.observabilities.InvokeCount)")
+    @Around("@annotation(io.cloudapp.api.observabilities.InvokeCount)")
     public Object invokeCountHandler(ProceedingJoinPoint pjp) throws Throwable {
         Object result = pjp.proceed();
         Object[] methodArgs = pjp.getArgs();

@@ -21,30 +21,39 @@ package com.alibaba.cloudapp.starter.oauth2.configuration;
 
 import com.alibaba.cloudapp.api.oauth2.AuthorizationService;
 import com.alibaba.cloudapp.api.oauth2.TokenStorageService;
+import com.alibaba.cloudapp.api.oauth2.handler.LoginHandler;
+import com.alibaba.cloudapp.api.oauth2.verifier.TokenVerifier;
+import com.alibaba.cloudapp.model.OAuth2Client;
+import com.alibaba.cloudapp.oauth2.filter.OAuthCallbackFilter;
+import com.alibaba.cloudapp.oauth2.filter.OAuthCheckLoginFilter;
+import com.alibaba.cloudapp.oauth2.handler.DefaultLoginHandler;
 import com.alibaba.cloudapp.oauth2.service.AuthorizationServiceImpl;
 import com.alibaba.cloudapp.oauth2.service.DefaultTokenStorageService;
 import com.alibaba.cloudapp.oauth2.verifier.IntrospectionTokenVerifier;
 import com.alibaba.cloudapp.oauth2.verifier.JwtTokenVerifier;
-import com.alibaba.cloudapp.starter.oauth2.properties.OAuth2ClientProperties;
-import com.alibaba.cloudapp.starter.properties.EnableModuleProperties;
+import com.alibaba.cloudapp.oauth2.verifier.SimpleTokenVerifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
+import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
 
 @AutoConfiguration
 @ConditionalOnClass(AuthorizationServiceImpl.class)
-@EnableModuleProperties(OAuth2ClientProperties.class)
-@ConditionalOnProperty(
-        prefix = OAuth2Component.BINDING_PROP_KEY,
-        value = "enabled",
-        havingValue = "true")
+@ConditionalOnBean(OAuth2Client.class)
 public class OAuth2AutoConfiguration {
+    
+    @Bean("oauthTemplate")
+    @ConditionalOnMissingBean(name = "oauthTemplate")
+    public RestTemplate oauth2Template() {
+        return new RestTemplate();
+    }
     
     @Bean("oauth2Component")
     @ConditionalOnMissingBean
-    public OAuth2Component oauth2Component(OAuth2ClientProperties properties) {
+    public OAuth2Component oauth2Component(OAuth2Client properties) {
         return new OAuth2Component(properties);
     }
     
@@ -60,18 +69,67 @@ public class OAuth2AutoConfiguration {
         return new DefaultTokenStorageService();
     }
     
-    @Bean("jwkTokenVerifier")
+    @Bean("tokenVerifier")
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = OAuth2Component.BINDING_PROP_KEY, name = "jwks-url")
-    public JwtTokenVerifier jwksTokenVerifier(OAuth2ClientProperties properties) {
-        return new JwtTokenVerifier(properties.getJwksUrl());
+    public TokenVerifier tokenVerifier(OAuth2Client properties) {
+        if (properties.getIntrospectionUri() != null) {
+            return new IntrospectionTokenVerifier(properties.getIntrospectionUri());
+        } else if (properties.getJwksUrl() != null) {
+            return new JwtTokenVerifier(properties.getJwksUrl());
+        } else {
+            return new SimpleTokenVerifier();
+        }
     }
     
-    @Bean("jwkTokenVerifier")
+    @Bean("loginHandler")
     @ConditionalOnMissingBean
-    @ConditionalOnProperty(prefix = OAuth2Component.BINDING_PROP_KEY, name =
-            "introspection-url")
-    public IntrospectionTokenVerifier introspectionTokenVerifier(OAuth2ClientProperties properties) {
-        return new IntrospectionTokenVerifier(properties.getIntrospectionUri());
+    public LoginHandler loginHandler(OAuth2Client properties) {
+        String loginSuccessUrl = properties.getLoginSuccessUrl();
+        if (!StringUtils.hasText(loginSuccessUrl)) {
+            loginSuccessUrl = OAuthCallbackFilter.DEFAULT_SUCCESS_URL;
+        }
+        return new DefaultLoginHandler(loginSuccessUrl);
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({
+            AuthorizationService.class,
+            TokenStorageService.class,
+    })
+    public OAuthCallbackFilter oAuthCallbackInterceptor(
+            AuthorizationService authorizationService,
+            TokenStorageService storageToken,
+            LoginHandler loginHandler
+    ) {
+        return new OAuthCallbackFilter(
+                authorizationService, storageToken, loginHandler
+        );
+    }
+    
+    /**
+     * grant_type: authorization_code | implicit
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({
+            AuthorizationService.class,
+            TokenStorageService.class,
+            TokenVerifier.class
+    })
+    public OAuthCheckLoginFilter oAuthCheckLoginFilter(
+            TokenStorageService storageToken,
+            TokenVerifier tokenVerifier,
+            AuthorizationService authorizationService,
+            OAuth2Client properties
+    ) {
+        
+        OAuthCheckLoginFilter filter = new OAuthCheckLoginFilter(
+                storageToken, tokenVerifier, authorizationService
+        );
+        if(properties.getFilterSkipUrls() != null) {
+            properties.getFilterSkipUrls().forEach(filter::addSkipUrls);
+        }
+        return filter;
     }
 }

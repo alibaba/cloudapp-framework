@@ -59,7 +59,7 @@ public class OSSStorageObjectService implements StorageObjectService<OSS> {
             OSSUtil.checkBucketExists(oss, targetBucket);
 
             CopyObjectRequest request = new CopyObjectRequest(
-                    sourceBucket, sourcePath, sourceBucket, targetPath);
+                    sourceBucket, sourcePath, targetBucket, targetPath);
 
             if(!override && oss.doesObjectExist(sourceBucket, targetPath)) {
                 throw new CloudAppException("Target already exists",

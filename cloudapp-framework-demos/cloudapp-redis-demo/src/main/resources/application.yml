@@ -2,11 +2,12 @@ spring:
   application:
     name: redis-demo
 
-
 io:
   cloudapp:
     redis:
       enabled: true
       base:
         host: ${REDIS_HOST}
-        port: 6379
+        port: ${REDIS_PORT:6379}
+        username: ${REDIS_USERNAME:}
+        password: ${REDIS_PASSWORD:}

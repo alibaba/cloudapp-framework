@@ -71,7 +71,7 @@ public class RefreshableDruidDataSourceAutoConfigure {
         LOGGER.info("Init DruidDataSource");
         RefreshableDruidDataSourceWrapper wrapper = new RefreshableDruidDataSourceWrapper();
 
-        long maxWaitMillis = properties.getMaxRefreshWaitSeconds() * 1000;
+        long maxWaitMillis = properties.getMaxRefreshWaitSeconds() * 1000L;
         wrapper.setMaxRefreshWaitMillis(maxWaitMillis);
 
         return wrapper;

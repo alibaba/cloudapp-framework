@@ -61,7 +61,7 @@ public class OSSExceptionConverter {
                 ex.getErrorCode().indexOf("Too") > 0
         )) {
             return new CloudAppInvalidRequestException(ex.getMessage(),
-                                                       "CloudApp.BucketNotExisted", ex);
+                    "CloudApp.BucketNotExisted", ex);
         }
 
         return new CloudAppException(ex.getMessage(), ex.getErrorCode(), ex);

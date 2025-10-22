@@ -20,22 +20,21 @@ and HTTP client, which automatically introduce the above dependencies when used 
 |                         | get traffic labels                            | <input type="checkbox" checked> | <input type="checkbox" checked> |
 |                         | check the traffic label                       | -                               | -                               |
 |                         | get the environment label                     | -                               | -                               |
-|                         | set up user request data                      | <input type="checkbox" checked> | <input type="checkbox" checked> |
-|                         | get user request data                         | <input type="checkbox" checked> | <input type="checkbox" checked> |
+|                         | set up user request data                      | -                               | <input type="checkbox" checked> |
+|                         | get user request data                         | -                               | <input type="checkbox" checked> |
 |                         | check if it's being released on canary        | -                               | -                               |
 |                         | check if the release is being warmed up       | -                               | -                               |
-|                         | get traceId                                   | <input type="checkbox" checked> | <input type="checkbox" checked> |
+|                         | get traceId                                   | -                               | <input type="checkbox" checked> |
 
 
 # Dependencies
 
-| **Components**                        | **SDK**                                      | **Version** |
-|:--------------------------------------|----------------------------------------------|-------------|
-| spring cloud alibaba nacos config     | spring-cloud-starter-alibaba-nacos-config    | 2021.0.5.0  |
-| spring cloud alibaba nacos discovery | spring-cloud-starter-alibaba-nacos-discovery | 2021.0.5.0  |
-| OpenTelemetry API                     | opentelemetry-api                            | 1.43.0      |
-| OpenTelemetry context                 | opentelemetry-context                        | 1.43.0      |
-| spring boot dubbo                     | dubbo-spring-boot-starter                    | 2.7.13      |
+| **Components**                           | **SDK**                                       | **Version**  |
+|:-----------------------------------------|-----------------------------------------------|--------------|
+| spring cloud alibaba nacos config        | spring-cloud-starter-alibaba-nacos-config     | 2021.0.5.0   |
+| spring cloud alibaba nacos discovery     | spring-cloud-starter-alibaba-nacos-discovery  | 2021.0.5.0   |
+| spring boot dubbo                        | dubbo-spring-boot-starter                     | 2.7.13       |
+| arms                                     | arms-sdk                                      | 1.7.3        |
 
 
 # Abstract

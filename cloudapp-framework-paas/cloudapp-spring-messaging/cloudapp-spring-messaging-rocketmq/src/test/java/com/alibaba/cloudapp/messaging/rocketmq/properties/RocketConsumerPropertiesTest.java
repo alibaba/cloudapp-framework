@@ -19,8 +19,7 @@
 
 package com.alibaba.cloudapp.messaging.rocketmq.properties;
 
-import org.apache.rocketmq.spring.annotation.MessageModel;
-import org.apache.rocketmq.spring.autoconfigure.RocketMQProperties;
+import org.apache.rocketmq.remoting.protocol.heartbeat.MessageModel;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,9 +73,8 @@ public class RocketConsumerPropertiesTest {
     
     @Test
     public void testMessageModelGetterAndSetter() {
-        final MessageModel messageModel = MessageModel.BROADCASTING;
-        properties.setMessageModel(messageModel);
-        assertEquals(messageModel,
+        properties.setMessageModel(MessageModel.BROADCASTING);
+        assertEquals(MessageModel.BROADCASTING,
                      properties.getMessageModel()
         );
     }
@@ -171,15 +169,6 @@ public class RocketConsumerPropertiesTest {
         final boolean isDefault = false;
         properties.setDefault(isDefault);
         assertFalse(properties.isDefault());
-    }
-    
-    @Test
-    public void testToRocketMqProperty() {
-        // Setup
-        // Run the test
-        final RocketMQProperties.PullConsumer result = properties.toRocketMqProperty();
-        
-        // Verify the results
     }
     
 }
