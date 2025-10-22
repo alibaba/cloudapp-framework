@@ -9,7 +9,7 @@
         <version>${revision}</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
+    <name>cloudapp-microservice-dubbo-aliyun</name>
     <artifactId>cloudapp-microservice-dubbo-aliyun</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
