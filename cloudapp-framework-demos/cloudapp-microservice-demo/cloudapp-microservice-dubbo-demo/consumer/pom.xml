@@ -38,7 +38,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <skip>false</skip>
-                    <mainClass>io.cloudapp.microservice.aliyun.demo.DubboConsumerDemoApplication</mainClass>
+                    <mainClass>com.alibaba.cloudapp.microservice.aliyun.demo.DubboConsumerDemoApplication</mainClass>
                 </configuration>
             </plugin>
         </plugins>
